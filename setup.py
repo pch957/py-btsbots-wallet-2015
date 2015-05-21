@@ -266,7 +266,6 @@ setup_dict = dict(
         "greenlet==0.4.2",
         "itsdangerous==0.23",
         "ujson==1.33",
-        "wsgiref==0.1.2",
         "bts"
         # your module dependencies
     ] + python_version_specific_requires,
