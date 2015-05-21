@@ -9,7 +9,7 @@
     <link href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" media="screen">
     <style type="text/css">
       .container {
-        max-width: 700px;
+        max-width: 1200px;
       }
       h2 {color: red;}
     </style>
@@ -30,7 +30,12 @@
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
           <ul class="nav navbar-nav">
             {{ nav_link('wallet', 'Wallet') }}
-            {{ nav_link('market', 'Market') }}
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Market<b class="caret"></b></a>
+              <ul class="dropdown-menu">
+                <li><a href="market">CNY/BTS</a></li>
+              </ul>
+            </li>
           </ul>
           <ul class="nav navbar-nav navbar-right">
             {{ nav_link('index', 'Login') }}

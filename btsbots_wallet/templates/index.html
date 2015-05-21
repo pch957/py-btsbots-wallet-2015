@@ -18,6 +18,7 @@
             // event handler for server sent data
             // the data is displayed in the "Received" section of the page
             socket.on('bts.blockchain.info', function(msg) {
+                console.log(JSON.stringify(msg))
                 document.getElementById('height').innerHTML = msg.height;
             });
 

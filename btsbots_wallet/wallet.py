@@ -22,7 +22,6 @@ bts_wallet.pusher = socketio
 
 def background_thread():
     """Example of how to send server generated events to clients."""
-    #chain_info = {}
     while True:
         time.sleep(10)
         bts_wallet.execute()
@@ -59,9 +58,10 @@ def wallet():
 def market():
     current_height = bts_orderbook.height
     order_book = bts_orderbook.order_book["CNY_BTS"]
+    deal_trx = bts_orderbook.deal_trx["CNY_BTS"]
     return render_template(
         'market.html', title="BTS market", current_height=current_height,
-        order_book=order_book
+        order_book=order_book, deal_trx=deal_trx
     )
 
 
@@ -74,7 +74,7 @@ def main():
     thread = Thread(target=background_thread)
     thread.start()
 
-    socketio.run(app)
+    socketio.run(app, use_reloader=False)
 
 if __name__ == '__main__':
     main()

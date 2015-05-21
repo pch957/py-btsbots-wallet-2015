@@ -14,10 +14,21 @@ def get_prefix(quote, base):
 
 class BTSOrderBook(object):
     def __init__(self):
+        self.market_list = [
+            ["BOTSCNY", "BTS"], ["CNY", "BTS"], ["USD", "BTS"],
+            ["GOLD", "BTS"], ["BTC", "BTS"], ["BDR.AAPL", "CNY"],
+            ["NOTE", "BTS"]]
+        self.init_done = False
         self.pusher = None
         self.order_book = {}
+        self.deal_trx = {}
+        for quote, base in self.market_list:
+            prefix = get_prefix(quote, base)
+            self.order_book[prefix] = {}
+            self.deal_trx[prefix] = []
         self.init_market()
         self.execute()
+        self.init_done = True
 
     def init_market(self):
         config_file = os.getenv("HOME") + "/.python-bts/bts_client.json"
@@ -29,10 +40,10 @@ class BTSOrderBook(object):
                               config_bts["host"], config_bts["port"])
         self.market = BTSMarket(self.bts_client)
         client_info = self.bts_client.get_info()
-        self.height = int(client_info["blockchain_head_block_num"]) - 1
+        self.height = int(client_info["blockchain_head_block_num"]) - 180
 
     def myPublish(self, topic, event):
-        if self.pusher:
+        if self.pusher and self.init_done:
             self.pusher.emit(topic, event, namespace="")
 
     def publish_deal_trx(self, deal_trx):
@@ -47,6 +58,10 @@ class BTSOrderBook(object):
             self.myPublish(
                 u'bts.orderbook.%s.trx' % (format_trx[0]), format_trx[1:])
             self.myPublish(u'bts.orderbook.trx', format_trx)
+            market = format_trx[0]
+            if market not in self.deal_trx:
+                self.deal_trx[market] = []
+            self.deal_trx[market].append(format_trx[1:])
             print(format_trx)
 
     def publish_place_trx(self, place_trx):
@@ -66,11 +81,7 @@ class BTSOrderBook(object):
             print(format_trx)
 
     def publish_order_book(self):
-        market_list = [
-            ["BOTSCNY", "BTS"], ["CNY", "BTS"], ["USD", "BTS"],
-            ["GOLD", "BTS"], ["BTC", "BTS"], ["BDR.AAPL", "CNY"],
-            ["NOTE", "BTS"]]
-        for quote, base in market_list:
+        for quote, base in self.market_list:
             prefix = get_prefix(quote, base)
             order_book = self.market.get_order_book(
                 quote, base)

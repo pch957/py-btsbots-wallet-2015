@@ -14,11 +14,17 @@
                 console.log("connect");
                 socket.emit('my event', {data: 'I\'m connected!'});
             });
+            order_book = {{ order_book|tojson|safe }}
+            refresh_order_book(order_book)
+            deal_trx = {{ deal_trx|tojson|safe }}
+            refresh_trx(deal_trx)
 
-            // event handler for server sent data
-            // the data is displayed in the "Received" section of the page
-            socket.on('bts.blockchain.info', function(msg) {
-                document.getElementById('height').innerHTML = msg.height;
+            socket.on('bts.orderbook.CNY_BTS', function(msg) {
+                refresh_order_book(msg)
+            });
+            socket.on('bts.orderbook.CNY_BTS.trx', function(msg) {
+                //console.log(JSON.stringify(msg))
+                refresh_trx([msg])
             });
 
         });
@@ -30,7 +36,181 @@
   {{ super() }}
 {% endblock %}
 {% block content %}
+<div class="clearfix"></div>
+<div class="list_div">
+				<div style="margin-right:25px;float:left;width:40%">
+					<div style="margin: 5px 0;">
+            <table height="25" width="428"><tbody><tr><td style="font-size:16px;color:#009900;border:0px;float:left;line-height:25px;text-align:left;" valign="middle" width="318"><b>bid</b></td><td style="border:0px;text-align:right" valign="middle" width="110" align="right"></td></tr></tbody></table>
+					</div>
+					<!-- <div style="clear:both;height:1px;background:#009900;width:100%;margin: 5px 0 0 0"></div> -->
+					<table id="order_book_bid" class="tableStyle1" width="428">
+						<tbody><tr>
+                <th width="120">Price(<span class="mkType"><text name="quote">CNY</text>/<text name="base">BTS</text></span>)</th>
+                <th width="120">Volume(<span class="coinName"><text name="base">BTS</text></span>)</th>
+                <th width="120">Balance(<span class="coinName"><text name="quote">CNY</text></span>)</th>
+						</tr>
+						
+        </tbody></table>
+				</div>
+				<div style="float:left;width:40%">
+					<div style="margin: 5px 0;">
+            <table height="25" width="428"><tbody><tr><td style="font-size:16px;color:#D01515;border:0px;float:left;line-height:25px;text-align:left;" valign="middle" width="318"><b>ask</b></td><td style="border:0px;text-align:right" valign="middle" width="110" align="right"></td></tr></tbody></table>
+					</div>
+					<!-- <div style="clear:both;height:1px;background:#D01515;width:100%;margin: 5px 0 0 0"></div> -->
+					<table id="order_book_ask" class="tableStyle1" width="428">
+            <th width="120">Price(<span class="mkType"><text name="quote">CNY</text>/<text name="base">BTS</text></span>)</th>
+            <th width="120">Volume(<span class="coinName"><text name="base">BTS</text></span>)</th>
+            <th width="120">Balance(<span class="coinName"><text name="quote">CNY</text></span>)</th>
+						</tr>
+						
+        </tbody></table>
+				</div>
+			</div>
+      
+<div class="clearfix"></div>
+<div class="list_div">
+        <div style="margin: 5px 0;font-size:16px;color:#FF9933;"><b>trade history</b></div>
+				<!-- <div style="clear:both;height:1px;background:#FF9933;width:70%;margin: 5px 0 0 0"></div> -->
+				<table id="transaction_history" style="float:left" id="tradeTable" class="tableStyle1" width="881">
+					<tbody><tr>
+<th>Time</th>
+<th>Block</th>
+<th>Type</th>
+<th>Price(<text name="quote">CNY</text>/<text name="base">BTS</text>)</th>
+<th>match volume(<text name="base">BTS</text>)</th>
+<th>match balance(<text name="quote">CNY</text>)</th>
+					</tr>
+					
+          </tbody></table>
+			</div>
   <br>
-  <h4>order book(CNY/BTS): <text id='order_book'>{{ order_book }}</text></h4>
+
+    <script type="text/javascript" charset="utf-8">
+var init_done = false;
+var active_session;
+var current_subscription = [];
+var reverse = false;
+
+refresh_order_book = function (text) {
+      var precision_price = 7
+      tab_bid = document.getElementById('order_book_bid');
+      tab_ask = document.getElementById('order_book_ask');
+      var order_bid_list = text["bids"];
+      var order_ask_list = text["asks"];
+      if (reverse == true){
+      order_bid_list = text["asks"];
+      order_ask_list = text["bids"];
+      }
+      var rowCount = tab_bid.rows.length;
+      for (var index = rowCount -1; index>0; index--) {
+         tab_bid.deleteRow(index);
+         }
+      var rowCount = tab_ask.rows.length;
+      for (var index = rowCount -1; index>0; index--) {
+         tab_ask.deleteRow(index);
+         }
+
+      for (index in order_bid_list) {
+        dataTR = tab_bid.insertRow();
+        var price = order_bid_list[index][0]
+        var volume = order_bid_list[index][1]
+        var balance = volume * price
+        if (reverse == true){
+        price = 1/order_bid_list[index][0]
+        balance = order_bid_list[index][1]
+        volume = balance / price
+        }
+        dataTR.insertCell(0).innerHTML = price.toFixed(precision_price);
+        dataTR.insertCell(1).innerHTML = volume.toFixed(2);
+        dataTR.insertCell(2).innerHTML = balance.toFixed(2);
+      } 
+      for (index in order_ask_list) {
+        dataTR = tab_ask.insertRow();
+        var price = order_ask_list[index][0]
+        var volume = order_ask_list[index][1]
+        var balance = volume * price
+        if (reverse == true){
+        price = 1/order_ask_list[index][0]
+        balance = order_ask_list[index][1]
+        volume = balance / price
+        }
+        dataTR.insertCell(0).innerHTML = price.toFixed(precision_price);
+        dataTR.insertCell(1).innerHTML = volume.toFixed(2);
+        dataTR.insertCell(2).innerHTML = balance.toFixed(2);
+      } 
+};
+
+Date.prototype.format = function(format) {
+   var date = {
+     "M+": this.getMonth() + 1,
+     "d+": this.getDate(),
+     "h+": this.getHours(),
+     "m+": this.getMinutes(),
+     "s+": this.getSeconds(),
+     "q+": Math.floor((this.getMonth() + 3) / 3),
+     "S+": this.getMilliseconds()
+   };
+   if (/(y+)/i.test(format)) {
+     format = format.replace(RegExp.$1, (this.getFullYear() + '').substr(4 - RegExp.$1.length));
+   }
+   for (var k in date) {
+     if (new RegExp("(" + k + ")").test(format)) {
+       format = format.replace(RegExp.$1, RegExp.$1.length == 1
+       ? date[k] : ("00" + date[k]).substr(("" + date[k]).length));
+     }
+   }
+   return format;
+}
+
+time_format = function (text) {
+   time = new Date(text+"Z")
+   //time = new Date(time.getTime() - time.getTimezoneOffset()*60000)
+   time_str = time.format('MM-dd hh:mm:ss')
+   return time_str;
+}
+
+refresh_trx = function (text) {
+      var precision_price = 7
+      if (!text) return;
+      tab = document.getElementById('transaction_history');
+      var hisData = text;
+      hisData.sort();
+      for (index in hisData) {
+        data = hisData[index];
+        blockid = data[0];
+        time = time_format(data[1])
+        type = data[2];
+        if (reverse == false) {
+        price = data[3].toFixed(precision_price);
+        volume = data[4].toFixed(3);
+        balance = (volume*price).toFixed(3)
+        }else{
+        if (type == "sell") {
+        type = "buy"
+        }else{
+        type = "sell"
+        }
+        price = (1/data[3]).toFixed(precision_price);
+        balance = data[4].toFixed(3);
+        volume = (balance/price).toFixed(3)
+        }
+
+        dataTR = tab.insertRow(1);
+        dataTR.insertCell(0).innerHTML = time;
+        dataTR.insertCell(1).innerHTML = blockid;
+        dataTR.insertCell(2).innerHTML = type;
+        dataTR.insertCell(3).innerHTML = price;
+        dataTR.insertCell(4).innerHTML = volume;
+        dataTR.insertCell(5).innerHTML = balance;
+      } 
+      try {
+        while (true) {
+          tab.deleteRow(41);
+        }
+      } catch (e) {
+      }
+};
+
+    </script>
 {% endblock %}
 
