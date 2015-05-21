@@ -6,13 +6,16 @@
       <title>{% block title %}{% endblock %} - Flask Super Example</title>
     {% endblock %}
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% block css %}
     <link href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/BTSbots.css') }}">
     <style type="text/css">
       .container {
         max-width: 1200px;
       }
       h2 {color: red;}
     </style>
+    {% endblock %}
   </head>
   <body>
     <nav class="navbar navbar-inverse" role="navigation">
