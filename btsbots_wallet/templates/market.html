@@ -18,6 +18,8 @@
             refresh_order_book(order_book)
             deal_trx = {{ deal_trx|tojson|safe }}
             refresh_trx(deal_trx)
+            place_trx = {{ place_trx|tojson|safe }}
+            refresh_order(place_trx)
 
             socket.on('bts.orderbook.CNY_BTS', function(msg) {
                 refresh_order_book(msg)
@@ -25,6 +27,10 @@
             socket.on('bts.orderbook.CNY_BTS.trx', function(msg) {
                 //console.log(JSON.stringify(msg))
                 refresh_trx([msg])
+            });
+            socket.on('bts.orderbook.CNY_BTS.order', function(msg) {
+                //console.log(JSON.stringify(msg))
+                refresh_order([msg])
             });
 
         });
@@ -72,6 +78,23 @@
         <div style="margin: 5px 0;font-size:16px;color:#FF9933;"><b>trade history</b></div>
 				<!-- <div style="clear:both;height:1px;background:#FF9933;width:70%;margin: 5px 0 0 0"></div> -->
 				<table id="transaction_history" style="float:left" id="tradeTable" class="tableStyle1" width="881">
+					<tbody><tr>
+<th>Time</th>
+<th>Block</th>
+<th>Type</th>
+<th>Price(<text name="quote">CNY</text>/<text name="base">BTS</text>)</th>
+<th>match volume(<text name="base">BTS</text>)</th>
+<th>match balance(<text name="quote">CNY</text>)</th>
+					</tr>
+					
+          </tbody></table>
+			</div>
+
+<div class="clearfix"></div>
+<div class="list_div">
+        <div style="margin: 5px 0;font-size:16px;color:#FF9933;"><b>order history</b></div>
+				<!-- <div style="clear:both;height:1px;background:#FF9933;width:70%;margin: 5px 0 0 0"></div> -->
+				<table id="order_history" style="float:left" id="tradeTable" class="tableStyle1" width="881">
 					<tbody><tr>
 <th>Time</th>
 <th>Block</th>
@@ -211,6 +234,47 @@ refresh_trx = function (text) {
       }
 };
 
+refresh_order = function (text) {
+      var precision_price = 7
+      if (!text) return;
+      tab = document.getElementById('order_history');
+      var hisData = text;
+      hisData.sort();
+      for (index in hisData) {
+        data = hisData[index];
+        blockid = data[0];
+        time = time_format(data[1])
+        type = data[2];
+        if (reverse == false) {
+        price = data[3].toFixed(precision_price);
+        volume = data[4].toFixed(3);
+        balance = (volume*price).toFixed(3)
+        }else{
+        if (type == "ask") {
+        type = "bid"
+        }else{
+        type = "ask"
+        }
+        price = (1/data[3]).toFixed(precision_price);
+        balance = data[4].toFixed(3);
+        volume = (balance/price).toFixed(3)
+        }
+
+        dataTR = tab.insertRow(1);
+        dataTR.insertCell(0).innerHTML = time;
+        dataTR.insertCell(1).innerHTML = blockid;
+        dataTR.insertCell(2).innerHTML = type;
+        dataTR.insertCell(3).innerHTML = price;
+        dataTR.insertCell(4).innerHTML = volume;
+        dataTR.insertCell(5).innerHTML = balance;
+      } 
+      try {
+        while (true) {
+          tab.deleteRow(41);
+        }
+      } catch (e) {
+      }
+};
     </script>
 {% endblock %}
 

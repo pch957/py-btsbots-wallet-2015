@@ -59,9 +59,10 @@ def market():
     current_height = bts_orderbook.height
     order_book = bts_orderbook.order_book["CNY_BTS"]
     deal_trx = bts_orderbook.deal_trx["CNY_BTS"]
+    place_trx = bts_orderbook.place_trx["CNY_BTS"]
     return render_template(
         'market.html', title="BTS market", current_height=current_height,
-        order_book=order_book, deal_trx=deal_trx
+        order_book=order_book, deal_trx=deal_trx, place_trx=place_trx
     )
 
 

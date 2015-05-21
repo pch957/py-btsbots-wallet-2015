@@ -22,10 +22,12 @@ class BTSOrderBook(object):
         self.pusher = None
         self.order_book = {}
         self.deal_trx = {}
+        self.place_trx = {}
         for quote, base in self.market_list:
             prefix = get_prefix(quote, base)
             self.order_book[prefix] = {}
             self.deal_trx[prefix] = []
+            self.place_trx[prefix] = []
         self.init_market()
         self.execute()
         self.init_done = True
@@ -78,6 +80,10 @@ class BTSOrderBook(object):
             self.myPublish(
                 u'bts.orderbook.%s.order' % (format_trx[0]), format_trx[1:])
             self.myPublish(u'bts.orderbook.order', format_trx)
+            market = format_trx[0]
+            if market not in self.place_trx:
+                self.place_trx[market] = []
+            self.place_trx[market].append(format_trx[1:])
             print(format_trx)
 
     def publish_order_book(self):
