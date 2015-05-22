@@ -32,16 +32,16 @@
 
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
           <ul class="nav navbar-nav">
-            {{ nav_link('wallet', 'Wallet') }}
+              <li><a href="wallet">{{ _('Wallet') }}</a></li>
             <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Market<b class="caret"></b></a>
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ _('Market') }}<b class="caret"></b></a>
               <ul class="dropdown-menu">
                 <li><a href="market">CNY/BTS</a></li>
               </ul>
             </li>
           </ul>
           <ul class="nav navbar-nav navbar-right">
-            {{ nav_link('login', 'Login') }}
+              <li><a href="login">{{ _('Login') }}</a></li>
           </ul>
         </div><!-- /.navbar-collapse -->
       </div><!-- /.container-fluid -->
