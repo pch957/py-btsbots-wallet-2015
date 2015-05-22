@@ -21,3 +21,4 @@ include tox.ini
 
 recursive-include btsbots_wallet/static *
 recursive-include btsbots_wallet/templates *
+recursive-include btsbots_wallet/translations *
