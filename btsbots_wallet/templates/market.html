@@ -46,27 +46,27 @@
 <div class="list_div">
 				<div style="margin-right:25px;float:left;width:40%">
 					<div style="margin: 5px 0;">
-            <table height="25" width="428"><tbody><tr><td style="font-size:16px;color:#009900;border:0px;float:left;line-height:25px;text-align:left;" valign="middle" width="318"><b>bid</b></td><td style="border:0px;text-align:right" valign="middle" width="110" align="right"></td></tr></tbody></table>
+                        <table height="25" width="428"><tbody><tr><td style="font-size:16px;color:#009900;border:0px;float:left;line-height:25px;text-align:left;" valign="middle" width="318"><b>{{ _('bid') }}</b></td><td style="border:0px;text-align:right" valign="middle" width="110" align="right"></td></tr></tbody></table>
 					</div>
 					<!-- <div style="clear:both;height:1px;background:#009900;width:100%;margin: 5px 0 0 0"></div> -->
 					<table id="order_book_bid" class="tableStyle1" width="428">
 						<tbody><tr>
-                <th width="120">Price(<span class="mkType"><text name="quote">CNY</text>/<text name="base">BTS</text></span>)</th>
-                <th width="120">Volume(<span class="coinName"><text name="base">BTS</text></span>)</th>
-                <th width="120">Balance(<span class="coinName"><text name="quote">CNY</text></span>)</th>
+                            <th width="120">{{ _('Price') }}(<span class="mkType"><text name="quote">CNY</text>/<text name="base">BTS</text></span>)</th>
+                <th width="120">{{ _('Volume') }}(<span class="coinName"><text name="base">BTS</text></span>)</th>
+                <th width="120">{{ _('Balance') }}(<span class="coinName"><text name="quote">CNY</text></span>)</th>
 						</tr>
 						
         </tbody></table>
 				</div>
 				<div style="float:left;width:40%">
 					<div style="margin: 5px 0;">
-            <table height="25" width="428"><tbody><tr><td style="font-size:16px;color:#D01515;border:0px;float:left;line-height:25px;text-align:left;" valign="middle" width="318"><b>ask</b></td><td style="border:0px;text-align:right" valign="middle" width="110" align="right"></td></tr></tbody></table>
+                        <table height="25" width="428"><tbody><tr><td style="font-size:16px;color:#D01515;border:0px;float:left;line-height:25px;text-align:left;" valign="middle" width="318"><b>{{ _('ask') }}</b></td><td style="border:0px;text-align:right" valign="middle" width="110" align="right"></td></tr></tbody></table>
 					</div>
 					<!-- <div style="clear:both;height:1px;background:#D01515;width:100%;margin: 5px 0 0 0"></div> -->
 					<table id="order_book_ask" class="tableStyle1" width="428">
-            <th width="120">Price(<span class="mkType"><text name="quote">CNY</text>/<text name="base">BTS</text></span>)</th>
-            <th width="120">Volume(<span class="coinName"><text name="base">BTS</text></span>)</th>
-            <th width="120">Balance(<span class="coinName"><text name="quote">CNY</text></span>)</th>
+            <th width="120">{{ _('Price') }}(<span class="mkType"><text name="quote">CNY</text>/<text name="base">BTS</text></span>)</th>
+            <th width="120">{{ _('Volume') }}(<span class="coinName"><text name="base">BTS</text></span>)</th>
+            <th width="120">{{ _('Balance') }}(<span class="coinName"><text name="quote">CNY</text></span>)</th>
 						</tr>
 						
         </tbody></table>
@@ -79,12 +79,12 @@
 				<!-- <div style="clear:both;height:1px;background:#FF9933;width:70%;margin: 5px 0 0 0"></div> -->
 				<table id="transaction_history" style="float:left" id="tradeTable" class="tableStyle1" width="881">
 					<tbody><tr>
-<th>Time</th>
-<th>Block</th>
-<th>Type</th>
-<th>Price(<text name="quote">CNY</text>/<text name="base">BTS</text>)</th>
-<th>match volume(<text name="base">BTS</text>)</th>
-<th>match balance(<text name="quote">CNY</text>)</th>
+<th>{{ _('Time') }}</th>
+<th>{{ _('Block') }}</th>
+<th>{{ _('Type') }}</th>
+<th>{{ _('Price') }}(<text name="quote">CNY</text>/<text name="base">BTS</text>)</th>
+<th>{{ _('match volume') }}(<text name="base">BTS</text>)</th>
+<th>{{ _('match balance') }}(<text name="quote">CNY</text>)</th>
 					</tr>
 					
           </tbody></table>
@@ -96,12 +96,12 @@
 				<!-- <div style="clear:both;height:1px;background:#FF9933;width:70%;margin: 5px 0 0 0"></div> -->
 				<table id="order_history" style="float:left" id="tradeTable" class="tableStyle1" width="881">
 					<tbody><tr>
-<th>Time</th>
-<th>Block</th>
-<th>Type</th>
-<th>Price(<text name="quote">CNY</text>/<text name="base">BTS</text>)</th>
-<th>volume(<text name="base">BTS</text>)</th>
-<th>balance(<text name="quote">CNY</text>)</th>
+<th>{{ _('Time') }}</th>
+<th>{{ _('Block') }}</th>
+<th>{{ _('Type') }}</th>
+<th>{{ _('Price') }}(<text name="quote">CNY</text>/<text name="base">BTS</text>)</th>
+<th>{{ _('Volume') }}(<text name="base">BTS</text>)</th>
+<th>{{ _('Balance') }}(<text name="quote">CNY</text>)</th>
 					</tr>
 					
           </tbody></table>

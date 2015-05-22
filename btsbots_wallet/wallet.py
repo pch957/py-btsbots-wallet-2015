@@ -7,6 +7,7 @@ from threading import Thread
 #from flask import Flask, render_template, session, request
 from flask import Flask, render_template, request, redirect, url_for
 from flask.ext.socketio import SocketIO, emit
+from flask.ext.babel import Babel
 from bts_wallet import BTSWallet
 from bts_orderbook import BTSOrderBook
 
@@ -14,10 +15,17 @@ app = Flask(__name__)
 app.debug = True
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app)
+babel = Babel(app)
 bts_orderbook = BTSOrderBook()
 bts_orderbook.pusher = socketio
 bts_wallet = BTSWallet(bts_orderbook.bts_client)
 bts_wallet.pusher = socketio
+
+
+@babel.localeselector
+def get_locale():
+    lang = ["en", "zh"]
+    return request.accept_languages.best_match(lang)
 
 
 def background_thread():
