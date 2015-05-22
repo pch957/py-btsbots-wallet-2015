@@ -5,7 +5,7 @@ monkey.patch_all()
 import time
 from threading import Thread
 #from flask import Flask, render_template, session, request
-from flask import Flask, render_template
+from flask import Flask, render_template, request, redirect, url_for
 from flask.ext.socketio import SocketIO, emit
 from bts_wallet import BTSWallet
 from bts_orderbook import BTSOrderBook
@@ -28,6 +28,16 @@ def background_thread():
         bts_orderbook.execute()
 
 
+def check_wallet_account():
+    _account = request.cookies.get('account')
+    account_list = bts_wallet.get_all_account()
+    if _account and _account in account_list:
+        bts_wallet.set_account(_account)
+        return True
+    else:
+        return False
+
+
 @app.template_filter()
 def datetimefilter(value, format='%Y/%m/%d %H:%M'):
     """convert a datetime to a different format."""
@@ -38,14 +48,26 @@ app.jinja_env.filters['datetimefilter'] = datetimefilter
 
 @app.route('/')
 def index():
+    if not check_wallet_account():
+        return redirect(url_for('login'))
     current_height = bts_orderbook.height
     #current_time = datetime.datetime.now()
     return render_template(
         'index.html', title="BTS wallet", current_height=current_height)
 
 
+@app.route('/login')
+def login():
+    account_list = bts_wallet.get_all_account()
+    return render_template(
+        'login.html', title="BTS wallet/choose account",
+        account_list=account_list)
+
+
 @app.route('/wallet')
 def wallet():
+    if not check_wallet_account():
+        return redirect(url_for('login'))
     current_height = bts_orderbook.height
     balance = bts_wallet.balance
     return render_template(

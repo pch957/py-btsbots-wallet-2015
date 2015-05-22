@@ -9,36 +9,66 @@ class BTSWallet(object):
     def __init__(self, client):
         self.bts_client = client
         self.pusher = None
-        self.balance = self.get_balance()
+        self.account = None
+        self.balance = None
         client_info = self.bts_client.get_info()
         self.height = int(client_info["blockchain_head_block_num"])
-        self.trx = self.get_trx()
+        self.accounts = None
+        self.update_accounts()
+        self.trx = None
+        self.update_trx()
 
     def myPublish(self, topic, event):
         if self.pusher:
             self.pusher.emit(topic, event, namespace="")
 
-    def get_balance(self):
-        return self.bts_client.get_balance()
-
     def get_account(self):
-        return "baozi"
+        if self.account in self.accounts:
+            return self.account
+        else:
+            return None
 
-    def get_trx(self, start=0, end=-1):
+    def get_all_account(self):
+        return self.accounts
+
+    def set_account(self, account):
+        if account in self.accounts:
+            if account != self.account:
+                self.account = account
+                self.update_balance()
+            return True
+        else:
+            return False
+
+    def update_balance(self):
+        account = self.get_account()
+        if account is None:
+            return None
+        balance = self.bts_client.get_balance(account)
+        if balance != self.balance:
+            self.myPublish("balance", balance)
+            self.balance = balance
+
+    def update_accounts(self):
+        accounts = self.bts_client.list_accounts()
+        if accounts != self.accounts:
+            self.myPublish("account_list", accounts)
+            self.accounts = accounts
+
+    def update_trx(self, start=0, end=-1):
         pass
-        #return self.bts_client.get_trx()
+        #trx = self.bts_client.get_trx()
+        #if trx is not None:
+        #    self.trx.extend(trx)
+        #    self.myPublish("trx", trx)
 
     def execute(self):
         client_info = self.bts_client.get_info()
         height_now = int(client_info["blockchain_head_block_num"])
         if(height_now <= self.height):
             return
-        balance = self.get_balance()
-        if balance != self.balance:
-            self.myPublish("balance", balance)
-            self.balance = balance
-        trx = self.get_trx(self.height+1, height_now)
-        if trx is not None:
-            self.trx.extend(trx)
-            self.myPublish("trx", trx)
+
+        self.update_balance()
+        self.update_accounts()
+        self.update_trx()
         self.height = height_now
