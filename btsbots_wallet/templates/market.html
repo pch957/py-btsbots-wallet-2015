@@ -3,35 +3,65 @@
 {% block head %}
     <script type="text/javascript" src="//code.jquery.com/jquery-1.4.2.min.js"></script>
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min.js"></script>
+    <script type="text/javascript" src="https://pusher.btsbots.com/autobahn.min.js"></script>
+    <script type="text/javascript" src="js/btsbots.js"></script>
     <script type="text/javascript" charset="utf-8">
         $(document).ready(function(){
-            namespace = ''; // change to an empty string to use the global namespace
-
-            // the socket.io documentation recommends sending an explicit package upon connection
-            // this is specially important when using the global namespace
-            var socket = io.connect('http://' + document.domain + ':' + location.port + namespace);
-            socket.on('connect', function() {
-                console.log("connect");
-                socket.emit('my event', {data: 'I\'m connected!'});
-            });
+            //var socket = get_socket()
+            var pusher = get_pusher()
             order_book = {{ order_book|tojson|safe }}
             refresh_order_book(order_book)
-            deal_trx = {{ deal_trx|tojson|safe }}
-            refresh_trx(deal_trx)
-            place_trx = {{ place_trx|tojson|safe }}
-            refresh_order(place_trx)
+            //deal_trx = {{ deal_trx|tojson|safe }}
+            //refresh_trx(deal_trx)
+            //place_trx = {{ place_trx|tojson|safe }}
+            //refresh_order(place_trx)
 
-            socket.on('bts.orderbook.CNY_BTS', function(msg) {
-                refresh_order_book(msg)
-            });
-            socket.on('bts.orderbook.CNY_BTS.trx', function(msg) {
-                //console.log(JSON.stringify(msg))
-                refresh_trx([msg])
-            });
-            socket.on('bts.orderbook.CNY_BTS.order', function(msg) {
-                //console.log(JSON.stringify(msg))
-                refresh_order([msg])
-            });
+            //socket.on('bts.orderbook.CNY_BTS', function(msg) {
+            //    //refresh_order_book(msg)
+            //});
+            //socket.on('bts.orderbook.CNY_BTS.trx', function(msg) {
+            //    //console.log(JSON.stringify(msg))
+            //    //refresh_trx([msg])
+            //});
+            //socket.on('bts.orderbook.CNY_BTS.order', function(msg) {
+            //    console.log(JSON.stringify(msg))
+            //    //refresh_order([msg])
+            //});
+
+            pusher.onopen = function (session) {
+                console.log("session open");
+                prefix="CNY_BTS"
+
+                function on_order_book(args) {
+                    refresh_order_book(args[0]);
+                }
+                session.subscribe('bts.orderbook.'+prefix, on_order_book)
+
+                function on_trx(args) {
+                    refresh_trx([args[0]]);
+                }
+                session.subscribe('bts.orderbook.'+prefix+".trx", on_trx)
+
+                function on_order(args) {
+                    console.log(JSON.stringify(args[0]))
+                    refresh_order([args[0]]);
+                }
+                session.subscribe('bts.orderbook.'+prefix+".order", on_order)
+
+                //session.call('btsbots.get_last', ['bts.orderbook.'+prefix]).then(
+                //        function (res) {
+                //        refresh_order_book(res);
+                //        });
+                session.call('btsbots.get_history', ['bts.orderbook.'+prefix+".order", 20]).then(
+                        function (res) {
+                        refresh_order(res);
+                        });
+                session.call('btsbots.get_history', ['bts.orderbook.'+prefix+".trx", 20]).then(
+                        function (res) {
+                        refresh_trx(res);
+                        });
+            };
+            pusher.open();
 
         });
     </script>
@@ -42,76 +72,126 @@
   {{ super() }}
 {% endblock %}
 {% block content %}
-<div class="clearfix"></div>
-<div class="list_div">
-				<div style="margin-right:25px;float:left;width:40%">
-					<div style="margin: 5px 0;">
-                        <table height="25" width="428"><tbody><tr><td style="font-size:16px;color:#009900;border:0px;float:left;line-height:25px;text-align:left;" valign="middle" width="318"><b>{{ _('bid') }}</b></td><td style="border:0px;text-align:right" valign="middle" width="110" align="right"></td></tr></tbody></table>
-					</div>
-					<!-- <div style="clear:both;height:1px;background:#009900;width:100%;margin: 5px 0 0 0"></div> -->
-					<table id="order_book_bid" class="tableStyle1" width="428">
-						<tbody><tr>
-                            <th width="120">{{ _('Price') }}(<span class="mkType"><text name="quote">CNY</text>/<text name="base">BTS</text></span>)</th>
-                <th width="120">{{ _('Volume') }}(<span class="coinName"><text name="base">BTS</text></span>)</th>
-                <th width="120">{{ _('Balance') }}(<span class="coinName"><text name="quote">CNY</text></span>)</th>
-						</tr>
-						
-        </tbody></table>
-				</div>
-				<div style="float:left;width:40%">
-					<div style="margin: 5px 0;">
-                        <table height="25" width="428"><tbody><tr><td style="font-size:16px;color:#D01515;border:0px;float:left;line-height:25px;text-align:left;" valign="middle" width="318"><b>{{ _('ask') }}</b></td><td style="border:0px;text-align:right" valign="middle" width="110" align="right"></td></tr></tbody></table>
-					</div>
-					<!-- <div style="clear:both;height:1px;background:#D01515;width:100%;margin: 5px 0 0 0"></div> -->
-					<table id="order_book_ask" class="tableStyle1" width="428">
-            <th width="120">{{ _('Price') }}(<span class="mkType"><text name="quote">CNY</text>/<text name="base">BTS</text></span>)</th>
-            <th width="120">{{ _('Volume') }}(<span class="coinName"><text name="base">BTS</text></span>)</th>
-            <th width="120">{{ _('Balance') }}(<span class="coinName"><text name="quote">CNY</text></span>)</th>
-						</tr>
-						
-        </tbody></table>
-				</div>
-			</div>
-      
-<div class="clearfix"></div>
-<div class="list_div">
-        <div style="margin: 5px 0;font-size:16px;color:#FF9933;"><b>{{ _('trade history') }}</b></div>
-				<!-- <div style="clear:both;height:1px;background:#FF9933;width:70%;margin: 5px 0 0 0"></div> -->
-				<table id="transaction_history" style="float:left" id="tradeTable" class="tableStyle1" width="881">
-					<tbody><tr>
-<th>{{ _('Time') }}</th>
-<th>{{ _('Block') }}</th>
-<th>{{ _('Type') }}</th>
-<th>{{ _('Price') }}(<text name="quote">CNY</text>/<text name="base">BTS</text>)</th>
-<th>{{ _('match volume') }}(<text name="base">BTS</text>)</th>
-<th>{{ _('match balance') }}(<text name="quote">CNY</text>)</th>
-					</tr>
-					
-          </tbody></table>
-			</div>
-
-<div class="clearfix"></div>
-<div class="list_div">
-        <div style="margin: 5px 0;font-size:16px;color:#FF9933;"><b>{{ _('order history') }}</b></div>
-				<!-- <div style="clear:both;height:1px;background:#FF9933;width:70%;margin: 5px 0 0 0"></div> -->
-				<table id="order_history" style="float:left" id="tradeTable" class="tableStyle1" width="881">
-					<tbody><tr>
-<th>{{ _('Time') }}</th>
-<th>{{ _('Block') }}</th>
-<th>{{ _('Type') }}</th>
-<th>{{ _('Price') }}(<text name="quote">CNY</text>/<text name="base">BTS</text>)</th>
-<th>{{ _('Volume') }}(<text name="base">BTS</text>)</th>
-<th>{{ _('Balance') }}(<text name="quote">CNY</text>)</th>
-					</tr>
-					
-          </tbody></table>
-			</div>
-  <br>
-
+        <div id="page-wrapper">
+            <div class="row">
+                <div class="col-lg-12">
+                    <h1 class="page-header">{{ _("Wallet Market") }}</h1>
+                </div>
+                <!-- /.col-lg-12 -->
+            </div>
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="panel panel-green">
+                        <div class="panel-heading">
+                            {{ _("Bid") }}
+                        </div>
+                        <!-- /.panel-heading -->
+                        <div class="panel-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped" id="order_book_bid">
+                                    <thead>
+                                        <tr>
+                                            <th>{{ _('Price') }}(<text name="quote">CNY</text>/<text name="base">BTS</text>)</th>
+                                            <th>{{ _('Volume') }}(<text name="base">BTS</text>)</th>
+                                            <th>{{ _('Balance') }}(<text name="quote">CNY</text>)</th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                            <!-- /.table-responsive -->
+                        </div>
+                        <!-- /.panel-body -->
+                    </div>
+                    <!-- /.panel -->
+                </div>
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="panel panel-red">
+                        <div class="panel-heading">
+                            {{ _("Ask") }}
+                        </div>
+                        <!-- /.panel-heading -->
+                        <div class="panel-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped" id="order_book_ask">
+                                    <thead>
+                                        <tr>
+                                            <th>{{ _('Price') }}(<text name="quote">CNY</text>/<text name="base">BTS</text>)</th>
+                                            <th>{{ _('Volume') }}(<text name="base">BTS</text>)</th>
+                                            <th>{{ _('Balance') }}(<text name="quote">CNY</text>)</th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                            <!-- /.table-responsive -->
+                        </div>
+                        <!-- /.panel-body -->
+                    </div>
+                    <!-- /.panel -->
+                </div>
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="panel panel-primary">
+                        <!-- /.panel-heading -->
+                        <div class="panel-heading">
+                            {{ _("Trade History") }}
+                        </div>
+                        <div class="panel-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped" id="transaction_history">
+                                    <thead>
+                                        <tr>
+                                            <th>{{ _('Time') }}</th>
+                                            <th>{{ _('Block') }}</th>
+                                            <th>{{ _('Type') }}</th>
+                                            <th>{{ _('Price') }}(<text name="quote">CNY</text>/<text name="base">BTS</text>)</th>
+                                            <th>{{ _('match volume') }}(<text name="base">BTS</text>)</th>
+                                            <th>{{ _('match balance') }}(<text name="quote">CNY</text>)</th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                        </div>
+                        <!-- /.panel-body -->
+                    </div>
+                    <!-- /.panel -->
+                </div>
+                <!-- /.col-lg-12 -->
+            </div>
+            <!-- /.row -->
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="panel panel-yellow">
+                        <!-- /.panel-heading -->
+                        <div class="panel-heading">
+                            {{ _("Order History") }}
+                        </div>
+                        <div class="panel-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped" id="order_history">
+                                    <thead>
+                                        <tr>
+                                            <th>{{ _('Time') }}</th>
+                                            <th>{{ _('Block') }}</th>
+                                            <th>{{ _('Type') }}</th>
+                                            <th>{{ _('Price') }}(<text name="quote">CNY</text>/<text name="base">BTS</text>)</th>
+                                            <th>{{ _('Volume') }}(<text name="base">BTS</text>)</th>
+                                            <th>{{ _('Balance') }}(<text name="quote">CNY</text>)</th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                        </div>
+                        <!-- /.panel-body -->
+                    </div>
+                    <!-- /.panel -->
+                </div>
+                <!-- /.col-lg-12 -->
+            </div>
+            <!-- /.row -->
+        </div>
+        <!-- /#page-wrapper -->
     <script type="text/javascript" charset="utf-8">
-var init_done = false;
-var active_session;
-var current_subscription = [];
 var reverse = false;
 
 refresh_order_book = function (text) {
@@ -163,35 +243,6 @@ refresh_order_book = function (text) {
       } 
 };
 
-Date.prototype.format = function(format) {
-   var date = {
-     "M+": this.getMonth() + 1,
-     "d+": this.getDate(),
-     "h+": this.getHours(),
-     "m+": this.getMinutes(),
-     "s+": this.getSeconds(),
-     "q+": Math.floor((this.getMonth() + 3) / 3),
-     "S+": this.getMilliseconds()
-   };
-   if (/(y+)/i.test(format)) {
-     format = format.replace(RegExp.$1, (this.getFullYear() + '').substr(4 - RegExp.$1.length));
-   }
-   for (var k in date) {
-     if (new RegExp("(" + k + ")").test(format)) {
-       format = format.replace(RegExp.$1, RegExp.$1.length == 1
-       ? date[k] : ("00" + date[k]).substr(("" + date[k]).length));
-     }
-   }
-   return format;
-}
-
-time_format = function (text) {
-   time = new Date(text+"Z")
-   //time = new Date(time.getTime() - time.getTimezoneOffset()*60000)
-   time_str = time.format('MM-dd hh:mm:ss')
-   return time_str;
-}
-
 refresh_trx = function (text) {
       var precision_price = 7
       if (!text) return;
@@ -242,13 +293,22 @@ refresh_order = function (text) {
       hisData.sort();
       for (index in hisData) {
         data = hisData[index];
+        // short with unlimited
+        if (data[3] == null){
+            data[3] = 0
+        }
         blockid = data[0];
         time = time_format(data[1])
         type = data[2];
         if (reverse == false) {
         price = data[3].toFixed(precision_price);
+        if (type == "bid" || type == "cover" || type == "cancel bid"){
+        balance = data[4].toFixed(3);
+        volume = (balance/price).toFixed(3)
+        }else{
         volume = data[4].toFixed(3);
         balance = (volume*price).toFixed(3)
+        }
         }else{
         if (type == "ask") {
         type = "bid"
@@ -256,10 +316,14 @@ refresh_order = function (text) {
         type = "ask"
         }
         price = (1/data[3]).toFixed(precision_price);
+        if (type == "bid" || type == "cover" || type == "cancel bid"){
+        volume = data[4].toFixed(3);
+        balance = (volume*price).toFixed(3)
+        }else{
         balance = data[4].toFixed(3);
         volume = (balance/price).toFixed(3)
         }
-
+        }
         dataTR = tab.insertRow(1);
         dataTR.insertCell(0).innerHTML = time;
         dataTR.insertCell(1).innerHTML = blockid;

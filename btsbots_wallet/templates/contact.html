@@ -1,0 +1,52 @@
+{% extends "layout.html" %}
+{% block title %}{{title}}{% endblock %}
+{% block head %}
+  {{ super() }}
+{% endblock %}
+
+{% block page %}{{title}}{% endblock %}
+{% block heading %}
+  {{ super() }}
+{% endblock %}
+
+{% block content %}
+        <div id="page-wrapper">
+            <div class="row">
+                <div class="col-lg-12">
+                    <h1 class="page-header">{{ _("Contact List") }}</h1>
+                </div>
+                <!-- /.col-lg-12 -->
+            </div>
+            <!-- /.row -->
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="panel panel-primary">
+
+                        <div class="panel-heading">
+                            <i class="fa fa-qq fa-fw"></i> {{ _("Contact List") }}
+                                    <span class="pull-right">
+                                        {{ _("Add Contact") }}
+                                    </span>
+                        </div>
+                        <!-- /.panel-heading -->
+                        <div class="panel-body">
+                            <div class="list-group">
+                                {% for account in contacts %}
+                                <a href="#" class="list-group-item">
+                                    <i class="fa fa-qq"></i> {{ account }}
+                                </a>
+                                {% endfor %}
+                            </div>
+                            <!-- /.list-group -->
+                        </div>
+                        <!-- /.panel-body -->
+                    </div>
+                </div>
+                <!-- /.col-lg-4 -->
+            </div>
+            <!-- /.row -->
+        </div>
+        <!-- /#page-wrapper -->
+
+{% endblock %}
+

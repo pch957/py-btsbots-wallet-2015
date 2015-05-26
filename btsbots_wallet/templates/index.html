@@ -3,34 +3,149 @@
 {% block head %}
     <script type="text/javascript" src="//code.jquery.com/jquery-1.4.2.min.js"></script>
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min.js"></script>
+    <script type="text/javascript" src="js/btsbots.js"></script>
     <script type="text/javascript" charset="utf-8">
         $(document).ready(function(){
-            namespace = ''; // change to an empty string to use the global namespace
+            var socket = get_socket()
 
-            // the socket.io documentation recommends sending an explicit package upon connection
-            // this is specially important when using the global namespace
-            var socket = io.connect('http://' + document.domain + ':' + location.port + namespace);
-            socket.on('connect', function() {
-                console.log("connect");
-                socket.emit('my event', {data: 'I\'m connected!'});
+            account = {{ account|tojson|safe }}
+            socket.on('user.'+account+'.balance', function(msg) {
+                //console.log(JSON.stringify(msg))
+                refresh_balance(msg)
+            });
+            socket.on('user.'+account+'.transaction', function(msg) {
+                //console.log(JSON.stringify(msg))
+                refresh_transaction(msg)
             });
 
-            // event handler for server sent data
-            // the data is displayed in the "Received" section of the page
-            socket.on('bts.blockchain.info', function(msg) {
-                console.log(JSON.stringify(msg))
-                document.getElementById('height').innerHTML = msg.height;
-            });
+            get_icon = function (asset) {
+            if (asset == "CNY"){
+            return "fa-cny"
+            }else if (asset == "BOTSCNY"){
+            return "fa-cny"
+            }else if (asset == "USD"){
+            return "fa-usd"
+            }else if (asset == "EUR"){
+            return "fa-eur"
+            }else if (asset == "BDR.AAPL"){
+            return "fa-apple"
+            }else if (asset == "BTC"){
+            return "fa-btc"
+            }else {
+            return "fa-btc"
+            }
+            }
 
+            refresh_balance = function (balance) {
+                //console.log(JSON.stringify(balance))
+            html_balance = ""
+            color=["green", "primary", "yellow", "red"]
+            index = 0
+            for (asset in balance) {
+                icon = get_icon(asset)
+                html_balance = html_balance + '<div class="col-lg-3 col-md-4"> \
+                               <div class="panel panel-'+color[index]+'"> \
+                               <div class="panel-heading"> \
+                               <div class="row"> \
+                                <div class="col-xs-2">\
+                                    <i class="fa '+icon+' fa-3x"></i>\
+                                </div>\
+                               <div class="col-xs-9 text-right"> \
+                               <div class="fa-2x">'+balance[asset].toLocaleString()+'</div>\
+                               <div class="fa-1x">'+asset+'</div>\
+                               </div>\
+                               </div>\
+                               </div>\
+                               <a href="#">\
+                               <div class="panel-footer">\
+                               <span class="pull-left">View Details</span>\
+                               <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>\
+                               <div class="clearfix"></div>\
+                               </div>\
+                               </a>\
+                               </div>\
+                               </div>'
+        index = (index+1) % 4
+            }
+        document.getElementById("balance").innerHTML = html_balance
+            };
+            refresh_balance({{ balance|tojson|safe }})
+
+            refresh_transaction = function (transaction) {
+                //console.log(JSON.stringify(transaction))
+                html_transaction = document.getElementById("transaction_history").innerHTML
+                    for(index in transaction){
+                        trx = transaction[index]
+                        if(trx["type"] == "send"){
+                            icon = "right"
+                        }else{
+                            icon = "left"
+                        }
+
+                html_newtrx = '<div class="panel panel-default"> \
+                                    <div class="panel-heading"> \
+                                    <a data-toggle="collapse" data-parent="#accordion" href="#'+trx["trx_id"]+'"> \
+                                            <i class="fa fa-long-arrow-'+icon+'"></i>  &nbsp   \
+                                        '+trx["account"]+'&nbsp'+trx["amount"]+trx["asset"]+'\
+                                        <span class="pull-right text-muted small"><em>'+trx["memo"]+'&nbsp&nbsp'+time_format(trx["timestamp"])+'</em> \
+                                    </span> \
+                                    </a> \
+                                    </div> \
+                                    <div id="'+trx["trx_id"]+'" class="panel-collapse collapse"> \
+                                        <div class="panel-body"> \
+                                            Detail \
+                                        </div> \
+                                    </div> \
+                                </div>'
+                html_transaction = html_newtrx+html_transaction
+                    }
+        document.getElementById("transaction_history").innerHTML = html_transaction
+            }
+            refresh_transaction({{ transaction|tojson|safe }})
         });
     </script>
   {{ super() }}
 {% endblock %}
+
 {% block page %}{{title}}{% endblock %}
 {% block heading %}
   {{ super() }}
 {% endblock %}
+
 {% block content %}
-  <br>
-  <h4>Current height: <text id='height'>{{ current_height }}</text></h4>
+        <div id="page-wrapper">
+            <div class="row">
+                <div class="col-lg-12">
+                    <h1 class="page-header">{{ _("Wallet Balance") }}: {{ account }}</h1>
+                </div>
+                <!-- /.col-lg-12 -->
+            </div>
+            <div class="row">
+                <div id="balance">
+                </div>
+            </div>
+            <!-- /.row -->
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            <i class="fa fa-exchange fa-fw"></i> {{ _("Transaction history") }}: {{ account }}
+                        </div>
+                        <!-- .panel-heading -->
+                        <div class="panel-body">
+                            <div class="panel-group" id="transaction_history">
+                            </div>
+                            <!-- /.list-group -->
+                            <a href="#" class="btn btn-default btn-block">View All Transactions</a>
+                        </div>
+                        <!-- .panel-body -->
+                    </div>
+                    <!-- /.panel -->
+                </div>
+                <!-- /.col-lg-12 -->
+            </div>
+            <!-- /.row -->
+        </div>
+        <!-- /#page-wrapper -->
+
 {% endblock %}

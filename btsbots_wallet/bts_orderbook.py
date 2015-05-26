@@ -107,12 +107,13 @@ class BTSOrderBook(object):
             self.myPublish(u'bts.blockchain.info',
                            {"height": height_now, "time_stamp": time_stamp})
             self.publish_order_book()
-        while self.height < height_now:
-            self.height += 1
-            trxs = self.bts_client.get_block_transactions(
-                self.height)
-            recs = self.market.get_order_deal_rec(self.height)
-            self.publish_deal_trx(recs)
-            recs = self.market.get_order_place_rec(trxs)
-            self.publish_place_trx(recs)
-            self.market.update_order_owner(recs)
+        # disable trx publish, get from pusher.btsbots.com
+        #while self.height < height_now:
+        #    self.height += 1
+        #    trxs = self.bts_client.get_block_transactions(
+        #        self.height)
+        #    recs = self.market.get_order_deal_rec(self.height)
+        #    self.publish_deal_trx(recs)
+        #    recs = self.market.get_order_place_rec(trxs)
+        #    self.publish_place_trx(recs)
+        #    self.market.update_order_owner(recs)
