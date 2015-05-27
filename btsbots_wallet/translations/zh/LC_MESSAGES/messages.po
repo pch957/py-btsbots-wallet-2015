@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-05-23 20:23+0800\n"
+"POT-Creation-Date: 2015-05-27 22:08+0800\n"
 "PO-Revision-Date: 2015-05-22 09:37+0800\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh <LL@li.org>\n"
@@ -17,18 +17,20 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 1.3\n"
 
-#: btsbots_wallet/wallet.py:69 btsbots_wallet/templates/layout.html:141
-#: btsbots_wallet/templates/backup/layout.html:35
+#: btsbots_wallet/app.py:57 btsbots_wallet/wallet.py:70
+#: btsbots_wallet/templates/layout.html:149
 msgid "Wallet"
 msgstr "钱包"
 
-#: btsbots_wallet/wallet.py:106 btsbots_wallet/templates/layout.html:144
-#: btsbots_wallet/templates/transaction.html:39
-msgid "Transaction"
+#: btsbots_wallet/app.py:71 btsbots_wallet/wallet.py:106
+#: btsbots_wallet/templates/layout.html:152
+#: btsbots_wallet/templates/transfer.html:35
+#: btsbots_wallet/templates/transfer.html:43
+msgid "Transfer"
 msgstr "转账"
 
-#: btsbots_wallet/wallet.py:143 btsbots_wallet/templates/layout.html:147
-#: btsbots_wallet/templates/backup/layout.html:37
+#: btsbots_wallet/app.py:106 btsbots_wallet/wallet.py:135
+#: btsbots_wallet/templates/layout.html:155
 msgid "Market"
 msgstr "市场"
 
@@ -41,165 +43,181 @@ msgstr "联系人列表"
 msgid "Add Contact"
 msgstr "增加联系人"
 
-#: btsbots_wallet/templates/index.html:127
+#: btsbots_wallet/templates/index.html:132
 msgid "Wallet Balance"
 msgstr "钱包余额"
 
-#: btsbots_wallet/templates/index.html:140
+#: btsbots_wallet/templates/index.html:145
 msgid "Transaction history"
 msgstr "转账记录"
 
-#: btsbots_wallet/templates/layout.html:12
-#: btsbots_wallet/templates/layout.html:55
+#: btsbots_wallet/templates/layout.html:47
+#: btsbots_wallet/templates/layout.html:65
 msgid "BTSBots wallet"
 msgstr "BTSBots钱包"
 
-#: btsbots_wallet/templates/layout.html:112
-#: btsbots_wallet/templates/waccount.html:24
-msgid "Select Account"
-msgstr "选择帐号"
+#: btsbots_wallet/templates/layout.html:122
+msgid "Settings"
+msgstr "设置"
 
-#: btsbots_wallet/templates/layout.html:150
+#: btsbots_wallet/templates/layout.html:125
+msgid "Logout"
+msgstr "登出"
+
+#: btsbots_wallet/templates/layout.html:158
 msgid "wallet market"
 msgstr "内盘市场"
 
-#: btsbots_wallet/templates/layout.html:153
+#: btsbots_wallet/templates/layout.html:161
 msgid "BTSBots market"
 msgstr "BTSBots市场"
 
-#: btsbots_wallet/templates/layout.html:156
+#: btsbots_wallet/templates/layout.html:164
 msgid "DACX market"
 msgstr "DACX市场"
 
-#: btsbots_wallet/templates/layout.html:162
+#: btsbots_wallet/templates/layout.html:170
 msgid "Contact"
 msgstr "联系人"
 
-#: btsbots_wallet/templates/layout.html:165
+#: btsbots_wallet/templates/layout.html:173
 msgid "Configurate"
 msgstr "配置"
 
-#: btsbots_wallet/templates/login.html:24
-msgid "Account List"
-msgstr "帐号列表"
+#: btsbots_wallet/templates/login.html:90
+msgid "wrong password"
+msgstr "错误的密码"
 
-#: btsbots_wallet/templates/market.html:48
-msgid "Wallet Market"
-msgstr "内盘市场"
+#: btsbots_wallet/templates/login.html:105
+msgid "Sign in"
+msgstr "登入"
 
-#: btsbots_wallet/templates/market.html:56
-msgid "Bid"
-msgstr "买单"
+#: btsbots_wallet/templates/login.html:105
+msgid "Sign up"
+msgstr "注册"
 
-#: btsbots_wallet/templates/market.html:64
-#: btsbots_wallet/templates/market.html:89
-#: btsbots_wallet/templates/market.html:117
-#: btsbots_wallet/templates/market.html:147
-#: btsbots_wallet/templates/backup/market.html:54
-#: btsbots_wallet/templates/backup/market.html:67
-#: btsbots_wallet/templates/backup/market.html:85
-#: btsbots_wallet/templates/backup/market.html:102
-msgid "Price"
-msgstr "价格"
+#: btsbots_wallet/templates/login.html:111
+#: btsbots_wallet/templates/waccount.html:22
+msgid "Select Account"
+msgstr "选择帐号"
 
-#: btsbots_wallet/templates/market.html:65
-#: btsbots_wallet/templates/market.html:90
-#: btsbots_wallet/templates/market.html:148
-#: btsbots_wallet/templates/backup/market.html:55
-#: btsbots_wallet/templates/backup/market.html:68
-#: btsbots_wallet/templates/backup/market.html:103
-msgid "Volume"
-msgstr "数量"
-
-#: btsbots_wallet/templates/market.html:66
-#: btsbots_wallet/templates/market.html:91
-#: btsbots_wallet/templates/market.html:149
-#: btsbots_wallet/templates/backup/market.html:56
-#: btsbots_wallet/templates/backup/market.html:69
-#: btsbots_wallet/templates/backup/market.html:104
-msgid "Balance"
-msgstr "额度"
-
-#: btsbots_wallet/templates/market.html:81
-msgid "Ask"
-msgstr "卖单"
-
-#: btsbots_wallet/templates/market.html:107
-msgid "Trade History"
-msgstr "成交记录"
-
-#: btsbots_wallet/templates/market.html:114
-#: btsbots_wallet/templates/market.html:144
-#: btsbots_wallet/templates/backup/market.html:82
-#: btsbots_wallet/templates/backup/market.html:99
-msgid "Time"
-msgstr "时间 "
-
-#: btsbots_wallet/templates/market.html:115
-#: btsbots_wallet/templates/market.html:145
-#: btsbots_wallet/templates/backup/market.html:83
-#: btsbots_wallet/templates/backup/market.html:100
-msgid "Block"
-msgstr "区块号"
-
-#: btsbots_wallet/templates/market.html:116
-#: btsbots_wallet/templates/market.html:146
-#: btsbots_wallet/templates/backup/market.html:84
-#: btsbots_wallet/templates/backup/market.html:101
-msgid "Type"
-msgstr "类型"
-
-#: btsbots_wallet/templates/market.html:118
-#: btsbots_wallet/templates/backup/market.html:86
-msgid "match volume"
-msgstr "成交量"
-
-#: btsbots_wallet/templates/market.html:119
-#: btsbots_wallet/templates/backup/market.html:87
-msgid "match balance"
-msgstr "成交额"
-
-#: btsbots_wallet/templates/market.html:137
-msgid "Order History"
-msgstr "下单记录"
-
-#: btsbots_wallet/templates/transaction.html:47
-msgid "Transfer"
-msgstr "转账"
-
-#: btsbots_wallet/templates/transaction.html:60
-msgid "Receiver"
-msgstr "收款人"
-
-#: btsbots_wallet/templates/transaction.html:68
-msgid "Asset"
-msgstr "资产"
-
-#: btsbots_wallet/templates/transaction.html:76
-msgid "Amount"
-msgstr "额度"
-
-#: btsbots_wallet/templates/transaction.html:80
-msgid "Memo"
-msgstr "附言"
-
-#: btsbots_wallet/templates/backup/layout.html:44
+#: btsbots_wallet/templates/login.html:120
 msgid "Login"
 msgstr "登录"
 
-#: btsbots_wallet/templates/backup/market.html:49
-msgid "bid"
+#: btsbots_wallet/templates/market.html:57
+msgid "Wallet Market"
+msgstr "内盘市场"
+
+#: btsbots_wallet/templates/market.html:65
+msgid "Bid"
 msgstr "买单"
 
-#: btsbots_wallet/templates/backup/market.html:63
-msgid "ask"
+#: btsbots_wallet/templates/market.html:73
+#: btsbots_wallet/templates/market.html:98
+#: btsbots_wallet/templates/market.html:126
+#: btsbots_wallet/templates/market.html:156
+msgid "Price"
+msgstr "价格"
+
+#: btsbots_wallet/templates/market.html:74
+#: btsbots_wallet/templates/market.html:99
+#: btsbots_wallet/templates/market.html:157
+msgid "Volume"
+msgstr "数量"
+
+#: btsbots_wallet/templates/market.html:75
+#: btsbots_wallet/templates/market.html:100
+#: btsbots_wallet/templates/market.html:158
+msgid "Balance"
+msgstr "额度"
+
+#: btsbots_wallet/templates/market.html:90
+msgid "Ask"
 msgstr "卖单"
 
-#: btsbots_wallet/templates/backup/market.html:78
-msgid "trade history"
+#: btsbots_wallet/templates/market.html:116
+msgid "Trade History"
 msgstr "成交记录"
 
-#: btsbots_wallet/templates/backup/market.html:95
-msgid "order history"
+#: btsbots_wallet/templates/market.html:123
+#: btsbots_wallet/templates/market.html:153
+msgid "Time"
+msgstr "时间 "
+
+#: btsbots_wallet/templates/market.html:124
+#: btsbots_wallet/templates/market.html:154
+msgid "Block"
+msgstr "区块号"
+
+#: btsbots_wallet/templates/market.html:125
+#: btsbots_wallet/templates/market.html:155
+msgid "Type"
+msgstr "类型"
+
+#: btsbots_wallet/templates/market.html:127
+msgid "match volume"
+msgstr "成交量"
+
+#: btsbots_wallet/templates/market.html:128
+msgid "match balance"
+msgstr "成交额"
+
+#: btsbots_wallet/templates/market.html:146
+msgid "Order History"
 msgstr "下单记录"
+
+#: btsbots_wallet/templates/new.html:84
+msgid "private key is wrong"
+msgstr "私钥错误,无法导入"
+
+#: btsbots_wallet/templates/new.html:99
+msgid "Import Private Key"
+msgstr "导入私钥"
+
+#: btsbots_wallet/templates/new.html:105
+msgid "Private key"
+msgstr "输入私钥"
+
+#: btsbots_wallet/templates/new.html:108
+msgid "Encrypt Password"
+msgstr "输入密码保护私钥"
+
+#: btsbots_wallet/templates/new.html:112
+msgid "Submit"
+msgstr "确定"
+
+#: btsbots_wallet/templates/transfer.html:56
+msgid "Receiver"
+msgstr "收款人"
+
+#: btsbots_wallet/templates/transfer.html:64
+msgid "Asset"
+msgstr "资产"
+
+#: btsbots_wallet/templates/transfer.html:72
+msgid "Amount"
+msgstr "额度"
+
+#: btsbots_wallet/templates/transfer.html:76
+msgid "Memo"
+msgstr "附言"
+
+#~ msgid "Transaction"
+#~ msgstr "转账"
+
+#~ msgid "Account List"
+#~ msgstr "帐号列表"
+
+#~ msgid "bid"
+#~ msgstr "买单"
+
+#~ msgid "ask"
+#~ msgstr "卖单"
+
+#~ msgid "trade history"
+#~ msgstr "成交记录"
+
+#~ msgid "order history"
+#~ msgstr "下单记录"
 

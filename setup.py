@@ -257,6 +257,7 @@ setup_dict = dict(
     install_requires=[
         "Flask==0.10.1",
         "Flask-Babel==0.9",
+        "Flask-Login",
         "Flask-SocketIO",
         "Jinja2==2.7.2",
         "MarkupSafe==0.18",

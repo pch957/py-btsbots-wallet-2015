@@ -1,32 +1,11 @@
 {% extends "layout.html" %}
 {% block title %}{{title}}{% endblock %}
 {% block head %}
-    <script type="text/javascript" src="//code.jquery.com/jquery-1.4.2.min.js"></script>
-    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min.js"></script>
     <script type="text/javascript" src="https://pusher.btsbots.com/autobahn.min.js"></script>
-    <script type="text/javascript" src="js/btsbots.js"></script>
     <script type="text/javascript" charset="utf-8">
         $(document).ready(function(){
             //var socket = get_socket()
             var pusher = get_pusher()
-            order_book = {{ order_book|tojson|safe }}
-            refresh_order_book(order_book)
-            //deal_trx = {{ deal_trx|tojson|safe }}
-            //refresh_trx(deal_trx)
-            //place_trx = {{ place_trx|tojson|safe }}
-            //refresh_order(place_trx)
-
-            //socket.on('bts.orderbook.CNY_BTS', function(msg) {
-            //    //refresh_order_book(msg)
-            //});
-            //socket.on('bts.orderbook.CNY_BTS.trx', function(msg) {
-            //    //console.log(JSON.stringify(msg))
-            //    //refresh_trx([msg])
-            //});
-            //socket.on('bts.orderbook.CNY_BTS.order', function(msg) {
-            //    console.log(JSON.stringify(msg))
-            //    //refresh_order([msg])
-            //});
 
             pusher.onopen = function (session) {
                 console.log("session open");
@@ -48,10 +27,10 @@
                 }
                 session.subscribe('bts.orderbook.'+prefix+".order", on_order)
 
-                //session.call('btsbots.get_last', ['bts.orderbook.'+prefix]).then(
-                //        function (res) {
-                //        refresh_order_book(res);
-                //        });
+                session.call('btsbots.get_last', ['bts.orderbook.'+prefix]).then(
+                        function (res) {
+                        refresh_order_book(res);
+                        });
                 session.call('btsbots.get_history', ['bts.orderbook.'+prefix+".order", 20]).then(
                         function (res) {
                         refresh_order(res);

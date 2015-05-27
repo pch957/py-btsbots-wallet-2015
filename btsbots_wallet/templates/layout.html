@@ -7,10 +7,6 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    {% block head %}
-    <title>{% block title %}{% endblock %} - {{ _("BTSBots wallet") }}</title>
-    {% endblock %}
-
     <!-- Bootstrap Core CSS -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
 
@@ -32,6 +28,24 @@
         <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
+
+    <!-- jQuery -->
+    <script src="js/jquery.min.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="js/bootstrap.min.js"></script>
+
+    <!-- Metis Menu Plugin JavaScript -->
+    <script src="js/metisMenu.min.js"></script>
+
+    <!-- Custom Theme JavaScript -->
+    <script src="js/sb-admin-2.js"></script>
+    <script src="js/btsbots.js"></script>
+    <script src="js/socket.io.min.js"></script>
+
+    {% block head %}
+    <title>{% block title %}{% endblock %} - {{ _("BTSBots wallet") }}</title>
+    {% endblock %}
 
 </head>
 
@@ -105,12 +119,10 @@
                         <i class="fa fa-user fa-fw"></i>  <i class="fa fa-caret-down"></i>
                     </a>
                     <ul class="dropdown-menu dropdown-user">
-                        <li><a href="waccount"><i class="fa fa-user fa-fw"></i> {{ _("Select Account") }}</a>
-                        </li>
-                        <li><a href="#"><i class="fa fa-gear fa-fw"></i> Settings</a>
+                        <li><a href="#"><i class="fa fa-gear fa-fw"></i> {{ _("Settings") }}</a>
                         </li>
                         <li class="divider"></li>
-                        <li><a href="#"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
+                        <li><a href="logout"><i class="fa fa-sign-out fa-fw"></i> {{ _("Logout") }}</a>
                         </li>
                     </ul>
                     <!-- /.dropdown-user -->
@@ -137,7 +149,7 @@
                         <a href="/"><i class="fa fa-dashboard fa-fw"></i> {{ _("Wallet") }}</a>
                         </li>
                         <li>
-                        <a href="transfer"><i class="fa fa-exchange fa-fw"></i> {{ _("Transfer") }}</a>
+                        <a href="#"><i class="fa fa-exchange fa-fw"></i> {{ _("Transfer") }}</a>
                         </li>
                         <li>
                         <a href="#"><i class="fa fa-bar-chart-o fa-fw"></i> {{ _("Market") }}<span class="fa arrow"></span></a>
@@ -175,19 +187,6 @@
     <br>
     <div class="footer">
     </div>
-
-    <!-- jQuery -->
-    <script src="js/jquery.min.js"></script>
-
-    <!-- Bootstrap Core JavaScript -->
-    <script src="js/bootstrap.min.js"></script>
-
-    <!-- Metis Menu Plugin JavaScript -->
-    <script src="js/metisMenu.min.js"></script>
-
-    <!-- Custom Theme JavaScript -->
-    <script src="js/sb-admin-2.js"></script>
-    <script src="js/btsbots.js"></script>
 
 </body>
 

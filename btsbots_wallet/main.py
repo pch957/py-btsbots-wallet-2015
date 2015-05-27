@@ -44,8 +44,10 @@ URL: <{url}>
     arg_parser.parse_args(args=argv[1:])
 
     #print(epilog)
-    import wallet
-    wallet.main()
+    #import wallet
+    #wallet.main()
+    import app
+    app.main()
 
     return 0
 

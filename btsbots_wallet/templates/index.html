@@ -1,19 +1,32 @@
 {% extends "layout.html" %}
 {% block title %}{{title}}{% endblock %}
 {% block head %}
-    <script type="text/javascript" src="//code.jquery.com/jquery-1.4.2.min.js"></script>
-    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min.js"></script>
-    <script type="text/javascript" src="js/btsbots.js"></script>
     <script type="text/javascript" charset="utf-8">
         $(document).ready(function(){
             var socket = get_socket()
 
-            account = {{ account|tojson|safe }}
-            socket.on('user.'+account+'.balance', function(msg) {
+            wallet_info = {{ wallet_info|tojson|safe }}
+            ele_name = document.getElementsByName("account")
+            for (index in ele_name)
+            { 
+            ele_name[index].innerHTML = wallet_info["account"]
+            }
+            if (localStorage.account) {
+                account_list = JSON.parse(localStorage.account)
+            }
+            for (index in account_list){
+            if (wallet_info["address"] == account_list[index]["address"] &&
+              account_list[index]["account"] != wallet_info["account"]){
+              account_list[index]["account"] = wallet_info["account"]
+              localStorage.account = JSON.stringify(account_list)
+            }
+            }
+
+            socket.on('user.'+wallet_info["address"]+'.balance', function(msg) {
                 //console.log(JSON.stringify(msg))
                 refresh_balance(msg)
             });
-            socket.on('user.'+account+'.transaction', function(msg) {
+            socket.on('user.'+wallet_info["address"]+'.transaction', function(msg) {
                 //console.log(JSON.stringify(msg))
                 refresh_transaction(msg)
             });
@@ -69,7 +82,7 @@
             }
         document.getElementById("balance").innerHTML = html_balance
             };
-            refresh_balance({{ balance|tojson|safe }})
+            refresh_balance(wallet_info["balance"])
 
             refresh_transaction = function (transaction) {
                 //console.log(JSON.stringify(transaction))
@@ -101,7 +114,7 @@
                     }
         document.getElementById("transaction_history").innerHTML = html_transaction
             }
-            refresh_transaction({{ transaction|tojson|safe }})
+            refresh_transaction(wallet_info["trx"])
         });
     </script>
   {{ super() }}
@@ -116,7 +129,7 @@
         <div id="page-wrapper">
             <div class="row">
                 <div class="col-lg-12">
-                    <h1 class="page-header">{{ _("Wallet Balance") }}: {{ account }}</h1>
+                  <h1 class="page-header">{{ _("Wallet Balance") }}: <text name="account"> </text></h1>
                 </div>
                 <!-- /.col-lg-12 -->
             </div>
@@ -129,7 +142,7 @@
                 <div class="col-lg-12">
                     <div class="panel panel-primary">
                         <div class="panel-heading">
-                            <i class="fa fa-exchange fa-fw"></i> {{ _("Transaction history") }}: {{ account }}
+                            <i class="fa fa-exchange fa-fw"></i> {{ _("Transaction history") }}: <text name="account"> </text>
                         </div>
                         <!-- .panel-heading -->
                         <div class="panel-body">
