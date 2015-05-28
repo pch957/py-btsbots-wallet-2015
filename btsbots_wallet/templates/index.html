@@ -13,12 +13,12 @@
             }
             if (localStorage.account) {
                 account_list = JSON.parse(localStorage.account)
-            }
             for (index in account_list){
             if (wallet_info["address"] == account_list[index]["address"] &&
               account_list[index]["account"] != wallet_info["account"]){
               account_list[index]["account"] = wallet_info["account"]
               localStorage.account = JSON.stringify(account_list)
+            }
             }
             }
 
@@ -28,7 +28,7 @@
             });
             socket.on('user.'+wallet_info["address"]+'.transaction', function(msg) {
                 //console.log(JSON.stringify(msg))
-                refresh_transaction(msg)
+                refresh_transaction([msg])
             });
 
             get_icon = function (asset) {

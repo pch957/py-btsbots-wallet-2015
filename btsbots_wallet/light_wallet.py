@@ -60,11 +60,16 @@ class LightWallet(object):
             "blockchain_list_address_transactions", [address]
         ).json()["result"]
         for trx_id in trxs_info:
-            trx = {}
             _trx = trxs_info[trx_id]["trx"]
+            _op = _trx["trx"]['operations'][0]
+            if _op["type"] == 'update_feed_op_type' or \
+                    _op["type"] == 'register_account_op_type' or \
+                    _op["type"] == 'update_account_op_type':
+                continue
+            trx = {}
+            owner_from = ""
+            owner_to = ""
             for _op in _trx["trx"]['operations']:
-                if _op["type"] == 'update_feed_op_type':
-                    break
                 if _op["type"] == "withdraw_op_type":
                     balance_id = _op["data"]["balance_id"]
                     balance_info = self.bts_client.request(
@@ -78,7 +83,10 @@ class LightWallet(object):
                     trx["amount"] = float(_op["data"]["amount"]) / \
                         self.bts_client.get_asset_precision(trx["asset"])
                     owner_to = _op["data"]["condition"]["data"]["owner"]
-                    trx["memo"] = _op["data"]["condition"]["data"]["memo"]
+                    if "memo" in _op["data"]["condition"]["data"]:
+                        trx["memo"] = _op["data"]["condition"]["data"]["memo"]
+                    else:
+                        trx["memo"] = None
                     continue
             trx["trx_id"] = trx_id[:8]
             trx["block_num"] = _trx["chain_location"]["block_num"]
@@ -90,10 +98,10 @@ class LightWallet(object):
                 self.bts_client.get_asset_precision(_trx["fees_paid"][0][0])
 
             if owner_from == address:
-                trx["account"] = owner_to
+                trx["account"] = self.get_account(owner_to)
                 trx["type"] = "send"
             elif owner_to == address:
-                trx["account"] = owner_from
+                trx["account"] = self.get_account(owner_from)
                 trx["type"] = "receive"
             trxs.append(trx)
         return sorted(trxs, key=lambda item:item["block_num"])
@@ -122,12 +130,15 @@ class LightWallet(object):
 
     def update_trx(self, trxs, virtual_trxs):
         for _trx in trxs:
+            _op = _trx[1]["trx"]['operations'][0]
+            if _op["type"] == 'update_feed_op_type' or \
+                    _op["type"] == 'register_account_op_type' or \
+                    _op["type"] == 'update_account_op_type':
+                continue
             trx = {}
             owner_from = ""
             owner_to = ""
             for _op in _trx[1]["trx"]['operations']:
-                if _op["type"] == 'update_feed_op_type':
-                    break
                 if _op["type"] == "withdraw_op_type":
                     balance_id = _op["data"]["balance_id"]
                     balance_info = self.bts_client.request(
@@ -160,7 +171,7 @@ class LightWallet(object):
 
             if owner_from in self.wallets:
                 trx_tmp = trx.copy()
-                trx_tmp["account"] = owner_to
+                trx_tmp["account"] = self.get_account(owner_to)
                 trx_tmp["type"] = "send"
                 self.myPublish("user."+owner_from+".transaction", trx_tmp)
                 self.wallets[owner_from]["trx"].append(trx_tmp)
@@ -168,7 +179,7 @@ class LightWallet(object):
 
             if owner_to in self.wallets and owner_to != owner_from:
                 trx_tmp = trx.copy()
-                trx_tmp["account"] = owner_from
+                trx_tmp["account"] = self.get_account(owner_from)
                 trx_tmp["type"] = "receive"
                 self.myPublish("user."+owner_to+".transaction", trx_tmp)
                 self.wallets[owner_to]["trx"].append(trx_tmp)

@@ -48,10 +48,10 @@ app.jinja_env.filters['datetimefilter'] = datetimefilter
 @app.route('/')
 def index():
     address = request.cookies.get('address')
-    print("address is ", address)
     if not address:
         return redirect(url_for('login'))
     wallet_info = bts_wallet.get_wallet(address)
+    print("account is ", wallet_info["account"])
     current_height = bts_wallet.height
     return render_template(
         'index.html', title=gettext(u"Wallet"), current_height=current_height,

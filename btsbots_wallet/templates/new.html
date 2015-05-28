@@ -94,16 +94,16 @@
                         <h3 class="panel-title">{{ _("Import Private Key") }}</h3>
                     </div>
                     <div class="panel-body">
-                        <form role="form" action="/" onsubmit="return save_key()">
-                            <fieldset>
                                 <div class="form-group">
-                                    <input class="form-control" id="private_key" placeholder={{ _("Private key") }} name="private_key" type="password" value="">
+                                    <input class="form-control" id="private_key" placeholder={{ _("Private key") }} type="password" value="">
                                 </div>
                                 <div class="form-group">
-                                    <input class="form-control" id="password" placeholder={{ _("Encrypt Password") }} name="password" type="password" value="">
+                                    <input class="form-control" id="password" placeholder={{ _("Encrypt Password") }} type="password" value="">
                                     <label id="msg"></label>
                                 </div>
                                 <!-- Change this to a button or input when using this as a form -->
+                        <form role="form" action="/" onsubmit="return save_key()">
+                            <fieldset>
                                 <input type="SUBMIT" value={{ _("Submit") }} class="btn btn-lg btn-success btn-block">
                             </fieldset>
                         </form>
