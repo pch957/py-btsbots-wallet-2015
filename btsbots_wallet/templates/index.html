@@ -6,10 +6,15 @@
             var socket = get_socket()
 
             wallet_info = {{ wallet_info|tojson|safe }}
+            if (wallet_info["account"] == "") {
+                account = wallet_info["address"].slice(0,8)
+                } else {
+                account = wallet_info["account"]
+                }
             ele_name = document.getElementsByName("account")
             for (index in ele_name)
             { 
-            ele_name[index].innerHTML = wallet_info["account"]
+            ele_name[index].innerHTML = account
             }
             if (localStorage.account) {
                 account_list = JSON.parse(localStorage.account)

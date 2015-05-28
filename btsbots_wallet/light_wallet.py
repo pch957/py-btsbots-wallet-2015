@@ -69,6 +69,7 @@ class LightWallet(object):
             trx = {}
             owner_from = ""
             owner_to = ""
+            trx["memo"] = None
             for _op in _trx["trx"]['operations']:
                 if _op["type"] == "withdraw_op_type":
                     balance_id = _op["data"]["balance_id"]
@@ -82,11 +83,10 @@ class LightWallet(object):
                         _op["data"]["condition"]["asset_id"])
                     trx["amount"] = float(_op["data"]["amount"]) / \
                         self.bts_client.get_asset_precision(trx["asset"])
-                    owner_to = _op["data"]["condition"]["data"]["owner"]
+                    if "owner" in _op["data"]["condition"]["data"]:
+                        owner_to = _op["data"]["condition"]["data"]["owner"]
                     if "memo" in _op["data"]["condition"]["data"]:
                         trx["memo"] = _op["data"]["condition"]["data"]["memo"]
-                    else:
-                        trx["memo"] = None
                     continue
             trx["trx_id"] = trx_id[:8]
             trx["block_num"] = _trx["chain_location"]["block_num"]
@@ -138,6 +138,7 @@ class LightWallet(object):
             trx = {}
             owner_from = ""
             owner_to = ""
+            trx["memo"] = None
             for _op in _trx[1]["trx"]['operations']:
                 if _op["type"] == "withdraw_op_type":
                     balance_id = _op["data"]["balance_id"]
@@ -151,11 +152,10 @@ class LightWallet(object):
                         _op["data"]["condition"]["asset_id"])
                     trx["amount"] = float(_op["data"]["amount"]) / \
                         self.bts_client.get_asset_precision(trx["asset"])
-                    owner_to = _op["data"]["condition"]["data"]["owner"]
+                    if "owner" in _op["data"]["condition"]["data"]:
+                        owner_to = _op["data"]["condition"]["data"]["owner"]
                     if "memo" in _op["data"]["condition"]["data"]:
                         trx["memo"] = _op["data"]["condition"]["data"]["memo"]
-                    else:
-                        trx["memo"] = None
                     continue
             if owner_from not in self.wallets and owner_to not in self.wallets:
                 continue

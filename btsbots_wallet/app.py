@@ -51,7 +51,7 @@ def index():
     if not address:
         return redirect(url_for('login'))
     wallet_info = bts_wallet.get_wallet(address)
-    print("account is ", wallet_info["account"])
+    print("account is ", wallet_info["account"], address)
     current_height = bts_wallet.height
     return render_template(
         'index.html', title=gettext(u"Wallet"), current_height=current_height,
