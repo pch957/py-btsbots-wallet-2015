@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-05-27 22:08+0800\n"
+"POT-Creation-Date: 2015-05-28 15:31+0800\n"
 "PO-Revision-Date: 2015-05-22 09:37+0800\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh <LL@li.org>\n"
@@ -84,24 +84,24 @@ msgstr "联系人"
 msgid "Configurate"
 msgstr "配置"
 
-#: btsbots_wallet/templates/login.html:90
+#: btsbots_wallet/templates/login.html:87
 msgid "wrong password"
 msgstr "错误的密码"
 
-#: btsbots_wallet/templates/login.html:105
+#: btsbots_wallet/templates/login.html:102
 msgid "Sign in"
 msgstr "登入"
 
-#: btsbots_wallet/templates/login.html:105
-msgid "Sign up"
-msgstr "注册"
+#: btsbots_wallet/templates/login.html:102
+msgid "Add account"
+msgstr "添加帐号"
 
-#: btsbots_wallet/templates/login.html:111
+#: btsbots_wallet/templates/login.html:106
 #: btsbots_wallet/templates/waccount.html:22
 msgid "Select Account"
 msgstr "选择帐号"
 
-#: btsbots_wallet/templates/login.html:120
+#: btsbots_wallet/templates/login.html:117
 msgid "Login"
 msgstr "登录"
 
@@ -167,25 +167,60 @@ msgstr "成交额"
 msgid "Order History"
 msgstr "下单记录"
 
-#: btsbots_wallet/templates/new.html:84
+#: btsbots_wallet/templates/new.html:104
 msgid "private key is wrong"
 msgstr "私钥错误,无法导入"
 
-#: btsbots_wallet/templates/new.html:99
+#: btsbots_wallet/templates/new.html:119
+msgid "Add Account"
+msgstr "添加帐号"
+
+#: btsbots_wallet/templates/new.html:123 btsbots_wallet/templates/new.html:134
+msgid "Create New"
+msgstr "创建新的帐号"
+
+#: btsbots_wallet/templates/new.html:125 btsbots_wallet/templates/new.html:153
 msgid "Import Private Key"
 msgstr "导入私钥"
 
-#: btsbots_wallet/templates/new.html:105
-msgid "Private key"
-msgstr "输入私钥"
+#: btsbots_wallet/templates/new.html:127 btsbots_wallet/templates/new.html:171
+msgid "Import Recovery Key"
+msgstr "导入脑钱包"
 
-#: btsbots_wallet/templates/new.html:108
-msgid "Encrypt Password"
-msgstr "输入密码保护私钥"
+#: btsbots_wallet/templates/new.html:135
+msgid "The private key is generate random, you must backup it, can't recovery!"
+msgstr "私钥是随机生成的，请备份好它，一旦丢失无法恢复！"
 
-#: btsbots_wallet/templates/new.html:112
+#: btsbots_wallet/templates/new.html:140 btsbots_wallet/templates/new.html:158
+#: btsbots_wallet/templates/new.html:176
+msgid "Input a password to protect your wallet file, you will need it when login"
+msgstr "输入一个密码用来加密保护你的钱包，每次登录时需要"
+
+#: btsbots_wallet/templates/new.html:142 btsbots_wallet/templates/new.html:160
+#: btsbots_wallet/templates/new.html:178
+msgid "Password"
+msgstr "密码"
+
+#: btsbots_wallet/templates/new.html:148 btsbots_wallet/templates/new.html:166
+#: btsbots_wallet/templates/new.html:184
 msgid "Submit"
 msgstr "确定"
+
+#: btsbots_wallet/templates/new.html:154
+msgid "Input your private key"
+msgstr "输入私钥"
+
+#: btsbots_wallet/templates/new.html:156
+msgid "PrivateKey"
+msgstr "私钥"
+
+#: btsbots_wallet/templates/new.html:172
+msgid "Input your recovery key"
+msgstr "输入脑钱包"
+
+#: btsbots_wallet/templates/new.html:174
+msgid "todo"
+msgstr "todo"
 
 #: btsbots_wallet/templates/transfer.html:56
 msgid "Receiver"
@@ -202,22 +237,3 @@ msgstr "额度"
 #: btsbots_wallet/templates/transfer.html:76
 msgid "Memo"
 msgstr "附言"
-
-#~ msgid "Transaction"
-#~ msgstr "转账"
-
-#~ msgid "Account List"
-#~ msgstr "帐号列表"
-
-#~ msgid "bid"
-#~ msgstr "买单"
-
-#~ msgid "ask"
-#~ msgstr "卖单"
-
-#~ msgid "trade history"
-#~ msgstr "成交记录"
-
-#~ msgid "order history"
-#~ msgstr "下单记录"
-

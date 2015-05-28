@@ -18,6 +18,7 @@
     <link href="css/sb-admin-2.css" rel="stylesheet">
 
     <!-- Custom Fonts -->
+    <link href="css/font-awesome.min.css" rel="stylesheet" type="text/css">
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -40,46 +41,70 @@
     <script type="text/javascript" charset="utf-8">
         $(document).ready(function(){
                 //console.log(JSON.stringify(msg))
+                refresh_key()
         });
     </script>
     <script src=js/bitshares.min.js></script>
     <script type="text/javascript" charset="utf-8">
-           save_key = function () {
-            if (localStorage.account) {
-                account_list = JSON.parse(localStorage.account)
-            }else{
-                account_list = [] 
-            }
+           msg_warning = "WARNING: It is not possible to recover a lost recovery key. \
+                      Make a backup, print it out, or write it down. Anyone with \
+                      access to your recovery key will have access to this wallet. "
+
+           refresh_key = function() {
+               var randArr = new Uint8Array(32)
+               window.crypto.getRandomValues(randArr) //populate array with cryptographically secure random numbers
+               key = bts.ecc.PrivateKey.fromBuffer(randArr)
+               document.getElementById("new_key").value=key.toWif()
+           }
+
+           create_new = function() {
+               private_key = document.getElementById("new_key").value
+               secret = document.getElementById("new_password").value
+               return add_account(private_key, secret)
+           }
+
+           import_private_key = function () {
                private_key = document.getElementById("private_key").value
+               secret = document.getElementById("private_password").value
+               return add_account(private_key, secret)
+           }
+
+           add_account = function (private_key, secret) {
+               if (localStorage.account) {
+                   account_list = JSON.parse(localStorage.account)
+               }else{
+                   account_list = [] 
+               }
                try {
+                   console.log(private_key)
+                   console.log(secret)
                    key = bts.ecc.PrivateKey.fromWif(private_key)
                    key_hex = key.toHex()
                    address = key.toPublicKey().toBtsAddy()
-               secret = document.getElementById("password").value
-               aes = bts.ecc.Aes.fromSecret(secret)
-               key_enc = aes.encryptHex(key_hex)
-               new_account = {"account":"", "key":key_enc, "address":address}
+                   aes = bts.ecc.Aes.fromSecret(secret)
+                   key_enc = aes.encryptHex(key_hex)
+                   new_account = {"account":"", "key":key_enc, "address":address}
                    found = 0
-            for (index in account_list){
-            if (address == account_list[index]["address"]){
-              account_list[index] = new_account
-                  found = 1
-            }
-            }
-                   if(found == 0){
-                account_list.push(new_account)
+                   for (index in account_list){
+                       if (address == account_list[index]["address"]){
+                           account_list[index] = new_account
+                           found = 1
+                       }
                    }
-               localStorage.account = JSON.stringify(account_list)
-            document.cookie="address="+address
-                           sessionStorage.key=key_hex;
+                   if(found == 0){
+                       account_list.push(new_account)
+                   }
+                   localStorage.account = JSON.stringify(account_list)
+                   document.cookie="address="+address
+                   sessionStorage.key=key_hex;
                }
                catch(err)
                {
                    console.log(err)
-                       document.getElementById("msg").innerHTML="{{ _('private key is wrong') }}"
+                   document.getElementById("msg").innerHTML="{{ _('private key is wrong') }}"
                    return false
                }
-    }
+           }
     </script>
 
 </head>
@@ -88,25 +113,79 @@
 
     <div class="container">
         <div class="row">
-            <div class="col-md-4 col-md-offset-4">
-                <div class="login-panel panel panel-default">
+            <div class="col-md-6 col-md-offset-3">
+                <div class="login-panel panel panel-primary">
                     <div class="panel-heading">
-                        <h3 class="panel-title">{{ _("Import Private Key") }}</h3>
+                        <h3 class="panel-title">{{ _("Add Account") }}</h3>
                     </div>
                     <div class="panel-body">
-                                <div class="form-group">
-                                    <input class="form-control" id="private_key" placeholder={{ _("Private key") }} type="password" value="">
+                            <ul class="nav nav-tabs">
+                                <li class="active"><a href="#new" data-toggle="tab">{{ _("Create New") }}</a>
+                                </li>
+                                <li><a href="#private" data-toggle="tab">{{ _("Import Private Key") }}</a>
+                                </li>
+                                <li><a href="#recovery" data-toggle="tab">{{ _("Import Recovery Key") }}</a>
+                                </li>
+                            </ul>
+
+                            <!-- Tab panes -->
+                            <div class="tab-content">
+                                <div class="tab-pane fade in active" id="new">
+                                    <h4>{{ _("Create New") }}</h4>
+                                    <p>{{ _("The private key is generate random, you must backup it, can't recovery!") }}</p>
+                                    <div class="form-group">
+                                        <tt><input class="form-control" id="new_key"  value="" readonly></tt>
+                                        <A href="#" onclick="refresh_key()"><span class="pull-right"><i class="fa fa-refresh"></i></span></A>
+                                    </div>
+                                    <p>{{ _("Input a password to protect your wallet file, you will need it when login") }}</p>
+                                    <div class="form-group">
+                                        <input class="form-control" id="new_password" placeholder={{ _("Password") }} type="password" value="">
+                                        <label id="msg"></label>
+                                    </div>
+                                    <!-- Change this to a button or input when using this as a form -->
+                                    <form role="form" action="/" onsubmit="return create_new()">
+                                        <fieldset>
+                                            <input type="SUBMIT" value={{ _("Submit") }} class="btn btn-lg btn-success btn-block">
+                                        </fieldset>
+                                    </form>
                                 </div>
-                                <div class="form-group">
-                                    <input class="form-control" id="password" placeholder={{ _("Encrypt Password") }} type="password" value="">
-                                    <label id="msg"></label>
+                                <div class="tab-pane fade" id="private">
+                                    <h4>{{ _("Import Private Key") }}</h4>
+                                    <p>{{ _("Input your private key") }}</p>
+                                    <div class="form-group">
+                                        <tt><input class="form-control" id="private_key"  placeholder={{ _("PrivateKey") }} value=""></tt>
+                                    </div>
+                                    <p>{{ _("Input a password to protect your wallet file, you will need it when login") }}</p>
+                                    <div class="form-group">
+                                        <input class="form-control" id="private_password" placeholder={{ _("Password") }} type="password" value="">
+                                        <label id="msg"></label>
+                                    </div>
+                                    <!-- Change this to a button or input when using this as a form -->
+                                    <form role="form" action="/" onsubmit="return import_private_key()">
+                                        <fieldset>
+                                            <input type="SUBMIT" value={{ _("Submit") }} class="btn btn-lg btn-success btn-block">
+                                        </fieldset>
+                                    </form>
                                 </div>
-                                <!-- Change this to a button or input when using this as a form -->
-                        <form role="form" action="/" onsubmit="return save_key()">
-                            <fieldset>
-                                <input type="SUBMIT" value={{ _("Submit") }} class="btn btn-lg btn-success btn-block">
-                            </fieldset>
-                        </form>
+                                <div class="tab-pane fade" id="recovery">
+                                    <h4>{{ _("Import Recovery Key") }}</h4>
+                                    <p>{{ _("Input your recovery key") }}</p>
+                                    <div class="form-group">
+                                        <tt><input class="form-control" id="recovery_key"  placeholder={{ _("todo") }} value="" disabled></tt>
+                                    </div>
+                                    <p>{{ _("Input a password to protect your wallet file, you will need it when login") }}</p>
+                                    <div class="form-group">
+                                        <input class="form-control" id="recovery_password" placeholder={{ _("Password") }} type="password" value="">
+                                        <label id="msg"></label>
+                                    </div>
+                                    <!-- Change this to a button or input when using this as a form -->
+                                    <form role="form" action="/" onsubmit="return import_recovery_key()">
+                                        <fieldset>
+                                            <input type="SUBMIT" value={{ _("Submit") }} class="btn btn-lg btn-success btn-block">
+                                        </fieldset>
+                                    </form>
+                                </div>
+                            </div>
                     </div>
                 </div>
             </div>
