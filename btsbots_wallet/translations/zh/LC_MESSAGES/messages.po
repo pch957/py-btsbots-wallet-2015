@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-05-28 15:31+0800\n"
+"POT-Creation-Date: 2015-05-29 09:00+0800\n"
 "PO-Revision-Date: 2015-05-22 09:37+0800\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh <LL@li.org>\n"
@@ -18,19 +18,19 @@ msgstr ""
 "Generated-By: Babel 1.3\n"
 
 #: btsbots_wallet/app.py:57 btsbots_wallet/wallet.py:70
-#: btsbots_wallet/templates/layout.html:149
+#: btsbots_wallet/templates/layout.html:164
 msgid "Wallet"
 msgstr "钱包"
 
 #: btsbots_wallet/app.py:71 btsbots_wallet/wallet.py:106
-#: btsbots_wallet/templates/layout.html:152
+#: btsbots_wallet/templates/layout.html:167
 #: btsbots_wallet/templates/transfer.html:35
 #: btsbots_wallet/templates/transfer.html:43
 msgid "Transfer"
 msgstr "转账"
 
 #: btsbots_wallet/app.py:106 btsbots_wallet/wallet.py:135
-#: btsbots_wallet/templates/layout.html:155
+#: btsbots_wallet/templates/layout.html:170
 msgid "Market"
 msgstr "市场"
 
@@ -43,65 +43,70 @@ msgstr "联系人列表"
 msgid "Add Contact"
 msgstr "增加联系人"
 
-#: btsbots_wallet/templates/index.html:132
+#: btsbots_wallet/templates/index.html:134
 msgid "Wallet Balance"
 msgstr "钱包余额"
 
-#: btsbots_wallet/templates/index.html:145
+#: btsbots_wallet/templates/index.html:147
 msgid "Transaction history"
 msgstr "转账记录"
 
-#: btsbots_wallet/templates/layout.html:47
-#: btsbots_wallet/templates/layout.html:65
+#: btsbots_wallet/templates/layout.html:53
+msgid "Register"
+msgstr "注册别名"
+
+#: btsbots_wallet/templates/layout.html:61
+#: btsbots_wallet/templates/layout.html:79
 msgid "BTSBots wallet"
 msgstr "BTSBots钱包"
 
-#: btsbots_wallet/templates/layout.html:122
+#: btsbots_wallet/templates/layout.html:136
 msgid "Settings"
 msgstr "设置"
 
-#: btsbots_wallet/templates/layout.html:125
+#: btsbots_wallet/templates/layout.html:140
 msgid "Logout"
 msgstr "登出"
 
-#: btsbots_wallet/templates/layout.html:158
+#: btsbots_wallet/templates/layout.html:173
 msgid "wallet market"
 msgstr "内盘市场"
 
-#: btsbots_wallet/templates/layout.html:161
+#: btsbots_wallet/templates/layout.html:176
 msgid "BTSBots market"
 msgstr "BTSBots市场"
 
-#: btsbots_wallet/templates/layout.html:164
+#: btsbots_wallet/templates/layout.html:179
 msgid "DACX market"
 msgstr "DACX市场"
 
-#: btsbots_wallet/templates/layout.html:170
+#: btsbots_wallet/templates/layout.html:185
 msgid "Contact"
 msgstr "联系人"
 
-#: btsbots_wallet/templates/layout.html:173
+#: btsbots_wallet/templates/layout.html:188
 msgid "Configurate"
 msgstr "配置"
 
-#: btsbots_wallet/templates/login.html:87
+#: btsbots_wallet/templates/login.html:88
 msgid "wrong password"
 msgstr "错误的密码"
 
-#: btsbots_wallet/templates/login.html:102
+#: btsbots_wallet/templates/login.html:103
 msgid "Sign in"
 msgstr "登入"
 
-#: btsbots_wallet/templates/login.html:102
+#: btsbots_wallet/templates/login.html:103
 msgid "Add account"
 msgstr "添加帐号"
 
-#: btsbots_wallet/templates/login.html:106
+#: btsbots_wallet/templates/login.html:107
 #: btsbots_wallet/templates/waccount.html:22
 msgid "Select Account"
 msgstr "选择帐号"
 
-#: btsbots_wallet/templates/login.html:117
+#: btsbots_wallet/templates/login.html:118
+#: btsbots_wallet/templates/new.html:119
 msgid "Login"
 msgstr "登录"
 
@@ -237,3 +242,4 @@ msgstr "额度"
 #: btsbots_wallet/templates/transfer.html:76
 msgid "Memo"
 msgstr "附言"
+

@@ -1,48 +1,181 @@
 {% extends "layout.html" %}
 {% block title %}{{title}}{% endblock %}
 {% block head %}
+    <script src="js/underscore-min.js"></script>
     <script type="text/javascript" src="https://pusher.btsbots.com/autobahn.min.js"></script>
     <script type="text/javascript" charset="utf-8">
-        $(document).ready(function(){
-            //var socket = get_socket()
-            var pusher = get_pusher()
+    var market_list=[["CNY", "BTS"], ["USD", "BTS"], ["GOLD", "BTS"], ["BTC", "BTS"], ["NOTE", "BTS"], ["BOTSCNY", "BTS"], ["CNY", "BDR.AAPL"]]
+    var pusher = get_pusher();
+    var g_reverse = false;
+    var g_session;
+    var init_done = false;
 
-            pusher.onopen = function (session) {
-                console.log("session open");
-                prefix="CNY_BTS"
+    get_market = function() {
+        if(localStorage.wallet_market){
+            return JSON.parse(localStorage.wallet_market);
+        } else {
+            return market_list[0];
+        }
 
-                function on_order_book(args) {
-                    refresh_order_book(args[0]);
-                }
-                session.subscribe('bts.orderbook.'+prefix, on_order_book)
-
-                function on_trx(args) {
-                    refresh_trx([args[0]]);
-                }
-                session.subscribe('bts.orderbook.'+prefix+".trx", on_trx)
-
-                function on_order(args) {
-                    console.log(JSON.stringify(args[0]))
-                    refresh_order([args[0]]);
-                }
-                session.subscribe('bts.orderbook.'+prefix+".order", on_order)
-
-                session.call('btsbots.get_last', ['bts.orderbook.'+prefix]).then(
-                        function (res) {
-                        refresh_order_book(res);
-                        });
-                session.call('btsbots.get_history', ['bts.orderbook.'+prefix+".order", 20]).then(
-                        function (res) {
-                        refresh_order(res);
-                        });
-                session.call('btsbots.get_history', ['bts.orderbook.'+prefix+".trx", 20]).then(
-                        function (res) {
-                        refresh_trx(res);
-                        });
+    }
+    var g_market = get_market()
+    save_market = function(market) {
+        g_market = market;
+        localStorage.wallet_market = JSON.stringify(market)
+    }
+    is_reverse = function(quote, base) {
+        if (quote == "CNY" &&  base == "BDR.AAPL"){
+            return true
+        } else {
+            return false
+        }
+    }
+    get_prefix = function(quote, base) {
+        var prefix;
+        if (is_reverse(quote, base)){
+            prefix = base + '_' + quote;
+        }else{ 
+            prefix = quote + '_' + base;
+        }
+        prefix = prefix.replace('.','-');
+        return prefix;
+    }
+    init_market_brief = function (market_list) {
+        html_market_brief = "";
+        color=["green", "primary", "yellow", "red"]
+        color_index = 0
+        for (index in market_list) {
+            quote = market_list[index][0]
+            base = market_list[index][1]
+            html_market_brief = html_market_brief + '<div class="col-lg-2 col-md-4"> \
+                       <div class="panel panel-'+color[color_index]+'"> \
+                       <div class="panel-heading"> \
+                       <div class="row"> \
+                        <div class="col-xs-2">\
+                        </div>\
+                        <div id="brief_'+get_prefix(quote, base)+'"></div> \
+                       </div>\
+                       </div>\
+                       <a href="#bid_order" onclick="change_market([\''+quote+'\',\''+base+'\'])">\
+                       <div class="panel-footer">\
+                       <span class="pull-left">'+quote+'/'+base+ '</span>\
+                       <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>\
+                       <div class="clearfix"></div>\
+                       </div>\
+                       </a>\
+                       </div>\
+                       </div>'
+            color_index = (color_index+1) % 4
+        }
+        document.getElementById("market_brief").innerHTML = html_market_brief;
+    };
+    init_market_brief2 = function() {
+            refresh_brief = function (res) {
+                        //console.log(JSON.stringify(res))
+                        quote = res["quote"];
+                        base = res["base"];
+                        price = (res["ask1"] + res["bid1"])/2;
+                        if (!_.find(market_list, [quote, base])){
+                            price = 1/price;
+                        }
+                        prefix = get_prefix(quote, base);
+                        html_market_brief = '<div class="col-xs-9 text-right"> \
+                           <div class="fa-1x">'+price.toFixed(6)+'</div>\
+                           </div>';
+                        document.getElementById("brief_"+prefix).innerHTML = html_market_brief;
             };
-            pusher.open();
+            for (index in market_list) {
+                quote = market_list[index][0];
+                base = market_list[index][1];
+                prefix = get_prefix(quote, base);
+                g_session.call('btsbots.get_last', ['bts.orderbook.'+prefix+'.brief']).then(
+                    function (res) {
+                        refresh_brief(res);
+                    }
+                );
+                function on_brief(args) {
+                    refresh_brief(args[0]);
+                }
+                g_session.subscribe('bts.orderbook.'+prefix+'.brief', on_brief)
+            }
+    }
+    change_market = function(market) {
+        if (_.isEqual(g_market, market)){
+             return;
+        }
+        init_done = false;
+        load_market(market);
+        save_market(market);
+    }
+    load_market = function(market) {
+        prefix = get_prefix(market[0], market[1]);
+        g_reverse = is_reverse(market[0], market[1]);
+        function on_order_book(args) {
+            refresh_order_book(args[0]);
+        }
+        g_session.subscribe('bts.orderbook.'+prefix, on_order_book).then(
+            function(subscription) {
+                current_subscription.push(subscription);
+            }
+        );
+ 
+        function on_trx(args) {
+            refresh_trx([args[0]]);
+        }
+        g_session.subscribe('bts.orderbook.'+prefix+".trx", on_trx).then(
+            function(subscription) {
+                current_subscription.push(subscription);
+            }
+        );
 
-        });
+        function on_order(args) {
+            refresh_order([args[0]]);
+        }
+        g_session.subscribe('bts.orderbook.'+prefix+".order", on_order).then(
+            function(subscription) {
+                current_subscription.push(subscription);
+            }
+        );
+ 
+        if (init_done == false) {
+            g_session.call('btsbots.get_last', ['bts.orderbook.'+prefix]).then(
+                function (res) {
+                    controls = document.getElementsByName('quote');
+                    var count = controls.length;
+                    for (var index = 0; index < count; index++){
+                        controls[index].innerHTML = g_market[0];
+                    }
+                    controls = document.getElementsByName('base');
+                    count = controls.length;
+                    for (var index = 0; index < count; index++){
+                        controls[index].innerHTML = g_market[1];
+                    }
+                    refresh_order_book(res);
+                });
+            clear_last_market();
+            g_session.call('btsbots.get_history', ['bts.orderbook.'+prefix+".order", 20]).then(
+                    function (res) {
+                    refresh_order(res);
+                    });
+            g_session.call('btsbots.get_history', ['bts.orderbook.'+prefix+".trx", 20]).then(
+                    function (res) {
+                    refresh_trx(res);
+                    });
+            init_done = true;
+        }
+    }
+
+    $(document).ready(function(){
+        pusher.onopen = function (session) {
+            g_session = session;
+            console.log("session open");
+            init_market_brief(market_list);
+            init_market_brief2();
+            load_market(g_market)
+        };
+        pusher.open();
+ 
+    });
     </script>
   {{ super() }}
 {% endblock %}
@@ -59,6 +192,10 @@
                 <!-- /.col-lg-12 -->
             </div>
             <div class="row">
+                <div id="market_brief">
+                </div>
+            </div>
+            <div id="bid_order" class="row">
                 <div class="col-lg-6">
                     <div class="panel panel-green">
                         <div class="panel-heading">
@@ -171,153 +308,173 @@
         </div>
         <!-- /#page-wrapper -->
     <script type="text/javascript" charset="utf-8">
-var reverse = false;
+    var current_subscription = [];
 
-refresh_order_book = function (text) {
-      var precision_price = 7
-      tab_bid = document.getElementById('order_book_bid');
-      tab_ask = document.getElementById('order_book_ask');
-      var order_bid_list = text["bids"];
-      var order_ask_list = text["asks"];
-      if (reverse == true){
-      order_bid_list = text["asks"];
-      order_ask_list = text["bids"];
-      }
-      var rowCount = tab_bid.rows.length;
-      for (var index = rowCount -1; index>0; index--) {
-         tab_bid.deleteRow(index);
-         }
-      var rowCount = tab_ask.rows.length;
-      for (var index = rowCount -1; index>0; index--) {
-         tab_ask.deleteRow(index);
-         }
-
-      for (index in order_bid_list) {
-        dataTR = tab_bid.insertRow();
-        var price = order_bid_list[index][0]
-        var volume = order_bid_list[index][1]
-        var balance = volume * price
-        if (reverse == true){
-        price = 1/order_bid_list[index][0]
-        balance = order_bid_list[index][1]
-        volume = balance / price
-        }
-        dataTR.insertCell(0).innerHTML = price.toFixed(precision_price);
-        dataTR.insertCell(1).innerHTML = volume.toFixed(2);
-        dataTR.insertCell(2).innerHTML = balance.toFixed(2);
-      } 
-      for (index in order_ask_list) {
-        dataTR = tab_ask.insertRow();
-        var price = order_ask_list[index][0]
-        var volume = order_ask_list[index][1]
-        var balance = volume * price
-        if (reverse == true){
-        price = 1/order_ask_list[index][0]
-        balance = order_ask_list[index][1]
-        volume = balance / price
-        }
-        dataTR.insertCell(0).innerHTML = price.toFixed(precision_price);
-        dataTR.insertCell(1).innerHTML = volume.toFixed(2);
-        dataTR.insertCell(2).innerHTML = balance.toFixed(2);
-      } 
-};
-
-refresh_trx = function (text) {
-      var precision_price = 7
-      if (!text) return;
-      tab = document.getElementById('transaction_history');
-      var hisData = text;
-      hisData.sort();
-      for (index in hisData) {
-        data = hisData[index];
-        blockid = data[0];
-        time = time_format(data[1])
-        type = data[2];
-        if (reverse == false) {
-        price = data[3].toFixed(precision_price);
-        volume = data[4].toFixed(3);
-        balance = (volume*price).toFixed(3)
-        }else{
-        if (type == "sell") {
-        type = "buy"
-        }else{
-        type = "sell"
-        }
-        price = (1/data[3]).toFixed(precision_price);
-        balance = data[4].toFixed(3);
-        volume = (balance/price).toFixed(3)
-        }
-
-        dataTR = tab.insertRow(1);
-        dataTR.insertCell(0).innerHTML = time;
-        dataTR.insertCell(1).innerHTML = blockid;
-        dataTR.insertCell(2).innerHTML = type;
-        dataTR.insertCell(3).innerHTML = price;
-        dataTR.insertCell(4).innerHTML = volume;
-        dataTR.insertCell(5).innerHTML = balance;
-      } 
-      try {
-        while (true) {
-          tab.deleteRow(41);
-        }
-      } catch (e) {
-      }
-};
-
-refresh_order = function (text) {
-      var precision_price = 7
-      if (!text) return;
-      tab = document.getElementById('order_history');
-      var hisData = text;
-      hisData.sort();
-      for (index in hisData) {
-        data = hisData[index];
-        // short with unlimited
-        if (data[3] == null){
-            data[3] = 0
-        }
-        blockid = data[0];
-        time = time_format(data[1])
-        type = data[2];
-        if (reverse == false) {
-        price = data[3].toFixed(precision_price);
-        if (type == "bid" || type == "cover" || type == "cancel bid"){
-        balance = data[4].toFixed(3);
-        volume = (balance/price).toFixed(3)
-        }else{
-        volume = data[4].toFixed(3);
-        balance = (volume*price).toFixed(3)
-        }
-        }else{
-        if (type == "ask") {
-        type = "bid"
-        }else{
-        type = "ask"
-        }
-        price = (1/data[3]).toFixed(precision_price);
-        if (type == "bid" || type == "cover" || type == "cancel bid"){
-        volume = data[4].toFixed(3);
-        balance = (volume*price).toFixed(3)
-        }else{
-        balance = data[4].toFixed(3);
-        volume = (balance/price).toFixed(3)
-        }
-        }
-        dataTR = tab.insertRow(1);
-        dataTR.insertCell(0).innerHTML = time;
-        dataTR.insertCell(1).innerHTML = blockid;
-        dataTR.insertCell(2).innerHTML = type;
-        dataTR.insertCell(3).innerHTML = price;
-        dataTR.insertCell(4).innerHTML = volume;
-        dataTR.insertCell(5).innerHTML = balance;
-      } 
-      try {
-        while (true) {
-          tab.deleteRow(41);
-        }
-      } catch (e) {
-      }
-};
+    clear_last_market = function() {
+    
+       tab = document.getElementById('transaction_history');
+       var rowCount = tab.rows.length;
+       for (var index = rowCount -1; index>0; index--) {
+           tab.deleteRow(index);
+       }
+       tab = document.getElementById('order_history');
+       var rowCount = tab.rows.length;
+       for (var index = rowCount -1; index>0; index--) {
+           tab.deleteRow(index);
+       }
+       //todo ....
+       var count =current_subscription.length ;
+       for (var index = 0; index<count; index++) {
+         g_session.unsubscribe(current_subscription[index]);
+       }
+       current_subscription= [];
+    }
+    
+    refresh_order_book = function (text) {
+          var precision_price = 7
+          tab_bid = document.getElementById('order_book_bid');
+          tab_ask = document.getElementById('order_book_ask');
+          var order_bid_list = text["bids"];
+          var order_ask_list = text["asks"];
+          if (g_reverse == true){
+          order_bid_list = text["asks"];
+          order_ask_list = text["bids"];
+          }
+          var rowCount = tab_bid.rows.length;
+          for (var index = rowCount -1; index>0; index--) {
+             tab_bid.deleteRow(index);
+             }
+          var rowCount = tab_ask.rows.length;
+          for (var index = rowCount -1; index>0; index--) {
+             tab_ask.deleteRow(index);
+             }
+    
+          for (index in order_bid_list) {
+            dataTR = tab_bid.insertRow();
+            var price = order_bid_list[index][0]
+            var volume = order_bid_list[index][1]
+            var balance = volume * price
+            if (g_reverse == true){
+            price = 1/order_bid_list[index][0]
+            balance = order_bid_list[index][1]
+            volume = balance / price
+            }
+            dataTR.insertCell(0).innerHTML = price.toFixed(precision_price);
+            dataTR.insertCell(1).innerHTML = volume.toFixed(2);
+            dataTR.insertCell(2).innerHTML = balance.toFixed(2);
+          } 
+          for (index in order_ask_list) {
+            dataTR = tab_ask.insertRow();
+            var price = order_ask_list[index][0]
+            var volume = order_ask_list[index][1]
+            var balance = volume * price
+            if (g_reverse == true){
+            price = 1/order_ask_list[index][0]
+            balance = order_ask_list[index][1]
+            volume = balance / price
+            }
+            dataTR.insertCell(0).innerHTML = price.toFixed(precision_price);
+            dataTR.insertCell(1).innerHTML = volume.toFixed(2);
+            dataTR.insertCell(2).innerHTML = balance.toFixed(2);
+          } 
+    };
+    
+    refresh_trx = function (text) {
+          var precision_price = 7
+          if (!text) return;
+          tab = document.getElementById('transaction_history');
+          var hisData = text;
+          hisData.sort();
+          for (index in hisData) {
+            data = hisData[index];
+            blockid = data[0];
+            time = time_format(data[1])
+            type = data[2];
+            if (g_reverse == false) {
+            price = data[3].toFixed(precision_price);
+            volume = data[4].toFixed(3);
+            balance = (volume*price).toFixed(3)
+            }else{
+            if (type == "sell") {
+            type = "buy"
+            }else{
+            type = "sell"
+            }
+            price = (1/data[3]).toFixed(precision_price);
+            balance = data[4].toFixed(3);
+            volume = (balance/price).toFixed(3)
+            }
+    
+            dataTR = tab.insertRow(1);
+            dataTR.insertCell(0).innerHTML = time;
+            dataTR.insertCell(1).innerHTML = blockid;
+            dataTR.insertCell(2).innerHTML = type;
+            dataTR.insertCell(3).innerHTML = price;
+            dataTR.insertCell(4).innerHTML = volume;
+            dataTR.insertCell(5).innerHTML = balance;
+          } 
+          try {
+            while (true) {
+              tab.deleteRow(41);
+            }
+          } catch (e) {
+          }
+    };
+    
+    refresh_order = function (text) {
+          var precision_price = 7
+          if (!text) return;
+          tab = document.getElementById('order_history');
+          var hisData = text;
+          hisData.sort();
+          for (index in hisData) {
+            data = hisData[index];
+            // short with unlimited
+            if (data[3] == null){
+                data[3] = 0
+            }
+            blockid = data[0];
+            time = time_format(data[1])
+            type = data[2];
+            if (g_reverse == false) {
+            price = data[3].toFixed(precision_price);
+            if (type == "bid" || type == "cover" || type == "cancel bid"){
+            balance = data[4].toFixed(3);
+            volume = (balance/price).toFixed(3)
+            }else{
+            volume = data[4].toFixed(3);
+            balance = (volume*price).toFixed(3)
+            }
+            }else{
+            if (type == "ask") {
+            type = "bid"
+            }else{
+            type = "ask"
+            }
+            price = (1/data[3]).toFixed(precision_price);
+            if (type == "bid" || type == "cover" || type == "cancel bid"){
+            volume = data[4].toFixed(3);
+            balance = (volume*price).toFixed(3)
+            }else{
+            balance = data[4].toFixed(3);
+            volume = (balance/price).toFixed(3)
+            }
+            }
+            dataTR = tab.insertRow(1);
+            dataTR.insertCell(0).innerHTML = time;
+            dataTR.insertCell(1).innerHTML = blockid;
+            dataTR.insertCell(2).innerHTML = type;
+            dataTR.insertCell(3).innerHTML = price;
+            dataTR.insertCell(4).innerHTML = volume;
+            dataTR.insertCell(5).innerHTML = balance;
+          } 
+          try {
+            while (true) {
+              tab.deleteRow(41);
+            }
+          } catch (e) {
+          }
+    };
     </script>
 {% endblock %}
 
