@@ -42,6 +42,20 @@
     <script src="js/sb-admin-2.js"></script>
     <script src="js/btsbots.js"></script>
     <script src="js/socket.io.min.js"></script>
+    <script type="text/javascript" charset="utf-8">
+        refresh_name = function(account_name) {
+            ele_name = document.getElementsByName("account_name")
+            for (index in ele_name)
+            { 
+            ele_name[index].innerHTML = account_name
+            }
+            if(account_name.slice(0,3) == "BTS"){
+               document.getElementById("register").innerHTML='<a href="#"><i class="fa fa-book fa-fw"></i> {{ _("Register") }}</a>'
+            }else{
+               document.getElementById("register").innerHTML=''
+            }
+        }
+    </script>
 
     {% block head %}
     <title>{% block title %}{% endblock %} - {{ _("BTSBots wallet") }}</title>
@@ -116,11 +130,12 @@
                 <!-- /.dropdown -->
                 <li class="dropdown">
                     <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                        <i class="fa fa-user fa-fw"></i>  <i class="fa fa-caret-down"></i>
+                        <i class="fa fa-user fa-fw"></i> <small name="account_name"></small> <i class="fa fa-caret-down"></i>
                     </a>
                     <ul class="dropdown-menu dropdown-user">
                         <li><a href="#"><i class="fa fa-gear fa-fw"></i> {{ _("Settings") }}</a>
                         </li>
+                        <li id="register"> </li>
                         <li class="divider"></li>
                         <li><a href="logout"><i class="fa fa-sign-out fa-fw"></i> {{ _("Logout") }}</a>
                         </li>
@@ -187,7 +202,9 @@
     <br>
     <div class="footer">
     </div>
-
+    <script type="text/javascript" charset="utf-8">
+        refresh_name(localStorage.account_name)
+    </script>
 </body>
 
 </html>

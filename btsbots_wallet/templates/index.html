@@ -7,15 +7,12 @@
 
             wallet_info = {{ wallet_info|tojson|safe }}
             if (wallet_info["account"] == "") {
-                account = wallet_info["address"].slice(0,8)
+                account_name = wallet_info["address"].slice(0,8)
                 } else {
-                account = wallet_info["account"]
+                account_name = wallet_info["account"]
                 }
-            ele_name = document.getElementsByName("account")
-            for (index in ele_name)
-            { 
-            ele_name[index].innerHTML = account
-            }
+            localStorage.account_name = account_name
+            refresh_name(localStorage.account_name)
             if (localStorage.account) {
                 account_list = JSON.parse(localStorage.account)
             for (index in account_list){
@@ -134,7 +131,7 @@
         <div id="page-wrapper">
             <div class="row">
                 <div class="col-lg-12">
-                  <h1 class="page-header">{{ _("Wallet Balance") }}: <text name="account"> </text></h1>
+                  <h1 class="page-header">{{ _("Wallet Balance") }}</h1>
                 </div>
                 <!-- /.col-lg-12 -->
             </div>
@@ -147,7 +144,7 @@
                 <div class="col-lg-12">
                     <div class="panel panel-primary">
                         <div class="panel-heading">
-                            <i class="fa fa-exchange fa-fw"></i> {{ _("Transaction history") }}: <text name="account"> </text>
+                            <i class="fa fa-exchange fa-fw"></i> {{ _("Transaction history") }}
                         </div>
                         <!-- .panel-heading -->
                         <div class="panel-body">

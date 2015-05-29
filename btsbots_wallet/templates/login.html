@@ -60,6 +60,7 @@
     <script type="text/javascript" charset="utf-8">
            login = function () {
                account = document.getElementById("account_list").value
+               document.cookie="account="+account
                    if (account == "demo.btsbots") {
                            document.cookie="address=BTS4JLfbQNkDi7WB3QNVkzT2RdmXPemBus4G"
                            sessionStorage.key_hex="791fb064d4c9154b8c8c1a5068a6faa7664943f05fb325bf2d2ef6e80f2ce39a";
