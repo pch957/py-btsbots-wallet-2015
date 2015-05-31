@@ -9,7 +9,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>SB Admin 2 - Bootstrap Admin Theme</title>
+    <title>{{title}} - {{ _("BTSBots wallet") }}</title>
 
     <!-- Bootstrap Core CSS -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
@@ -64,9 +64,19 @@
            }
 
            import_private_key = function () {
-               private_key = document.getElementById("private_key").value
-               secret = document.getElementById("private_password").value
-               return add_account(private_key, secret)
+               private_key = document.getElementById("private_key").value;
+               secret = document.getElementById("private_password").value;
+               ret = add_account(private_key, secret);
+               if(!ret) {
+                   console.log("wrong")
+                   //document.getElementById("msg_private").innerHTML="{{ _('private key is wrong') }}";
+                   document.getElementById("msg_private").innerHTML= ' \
+                            <div class="alert alert-danger alert-dismissable"> \
+                                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button> \
+                                {{ _('private key is wrong') }} \
+                            </div>'
+                   return false;
+               }
            }
 
            add_account = function (private_key, secret) {
@@ -97,11 +107,11 @@
                    localStorage.account = JSON.stringify(account_list)
                    document.cookie="address="+address
                    sessionStorage.key=key_hex;
+                   return true;
                }
                catch(err)
                {
-                   console.log(err)
-                   document.getElementById("msg").innerHTML="{{ _('private key is wrong') }}"
+                   //console.log(err)
                    return false
                }
            }
@@ -140,7 +150,7 @@
                                     <p>{{ _("Input a password to protect your wallet file, you will need it when login") }}</p>
                                     <div class="form-group">
                                         <input class="form-control" id="new_password" placeholder={{ _("Password") }} type="password" value="">
-                                        <label id="msg"></label>
+                                        <label id="msg_new"></label>
                                     </div>
                                     <!-- Change this to a button or input when using this as a form -->
                                     <form role="form" action="/" onsubmit="return create_new()">
@@ -158,7 +168,7 @@
                                     <p>{{ _("Input a password to protect your wallet file, you will need it when login") }}</p>
                                     <div class="form-group">
                                         <input class="form-control" id="private_password" placeholder={{ _("Password") }} type="password" value="">
-                                        <label id="msg"></label>
+                                        <div id="msg_private"></div>
                                     </div>
                                     <!-- Change this to a button or input when using this as a form -->
                                     <form role="form" action="/" onsubmit="return import_private_key()">
@@ -176,7 +186,7 @@
                                     <p>{{ _("Input a password to protect your wallet file, you will need it when login") }}</p>
                                     <div class="form-group">
                                         <input class="form-control" id="recovery_password" placeholder={{ _("Password") }} type="password" value="">
-                                        <label id="msg"></label>
+                                        <div id="msg_recovery"></div>
                                     </div>
                                     <!-- Change this to a button or input when using this as a form -->
                                     <form role="form" action="/" onsubmit="return import_recovery_key()">
