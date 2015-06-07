@@ -325,7 +325,10 @@
        //todo ....
        var count =current_subscription.length ;
        for (var index = 0; index<count; index++) {
-         g_session.unsubscribe(current_subscription[index]);
+           try{
+               g_session.unsubscribe(current_subscription[index]);
+           } catch (e) {
+           }
        }
        current_subscription= [];
     }
