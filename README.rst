@@ -18,7 +18,7 @@ Quick Start
 
 #. Run::
 
-       $ btsbots_wallet_cli
+       $ btsbots_wallet
 
 open your browser, visit http://localhost:5000
 

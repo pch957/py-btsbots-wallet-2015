@@ -255,19 +255,19 @@ setup_dict = dict(
     ],
     packages=find_packages(exclude=(TESTS_DIRECTORY,)),
     install_requires=[
-        "Flask==0.10.1",
-        "Flask-Babel==0.9",
+        "Flask",
+        "Flask-Babel",
         "Flask-Login",
         "Flask-SocketIO",
-        "Jinja2==2.7.2",
-        "MarkupSafe==0.18",
-        "Werkzeug==0.9.4",
-        "gevent==1.0",
-        "gevent-socketio==0.3.6",
-        "gevent-websocket==0.9.2",
-        "greenlet==0.4.2",
-        "itsdangerous==0.23",
-        "ujson==1.33",
+        "Jinja2",
+        "MarkupSafe",
+        "Werkzeug",
+        "gevent",
+        "gevent-socketio",
+        "gevent-websocket",
+        "greenlet",
+        "itsdangerous",
+        "ujson",
         "bts"
         # your module dependencies
     ] + python_version_specific_requires,
@@ -281,7 +281,7 @@ setup_dict = dict(
     zip_safe=False,  # don't use eggs
     entry_points={
         'console_scripts': [
-            'btsbots_wallet_cli = btsbots_wallet.main:entry_point'
+            'btsbots_wallet = btsbots_wallet.main:entry_point'
         ],
         # if you have a gui, use this
         # 'gui_scripts': [
