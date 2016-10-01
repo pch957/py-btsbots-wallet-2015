@@ -42,20 +42,6 @@
     <script src="js/sb-admin-2.js"></script>
     <script src="js/btsbots.js"></script>
     <script src="js/socket.io.min.js"></script>
-    <script type="text/javascript" charset="utf-8">
-        refresh_name = function(account_name) {
-            ele_name = document.getElementsByName("account_name")
-            for (index in ele_name)
-            { 
-            ele_name[index].innerHTML = account_name
-            }
-            if(account_name.slice(0,3) == "BTS"){
-               document.getElementById("register").innerHTML='<a href="#"><i class="fa fa-book fa-fw"></i> {{ _("Register") }}</a>'
-            }else{
-               document.getElementById("register").innerHTML=''
-            }
-        }
-    </script>
 
     {% block head %}
     <title>{% block title %}{% endblock %} - {{ _("BTSBots wallet") }}</title>
@@ -76,7 +62,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="/">{{ _("BTSBots wallet") }}</a>
+                <a class="navbar-brand" href="/">{{ _("BTSBots Block Explorer") }}</a>
             </div>
             <!-- /.navbar-header -->
 
@@ -161,19 +147,7 @@
                             <!-- /input-group -->
                         </li>
                         <li>
-                        <a href="/"><i class="fa fa-dashboard fa-fw"></i> {{ _("Wallet") }}</a>
-                        </li>
-                        <li>
-                        <a href="#"><i class="fa fa-exchange fa-fw"></i> {{ _("Transfer") }}</a>
-                        </li>
-                        <li>
-                        <a href="market"><i class="fa fa-bar-chart-o fa-fw"></i> {{ _("Market") }}</a>
-                        </li>
-                        <li>
-                        <a href="contact"><i class="fa fa-edit fa-fw"></i> {{ _("Contact") }}</a>
-                        </li>
-                        <li>
-                            <a href="#"><i class="fa fa-wrench fa-fw"></i> {{ _("Configurate") }}</a>
+                        <a href="/"><i class="fa fa-dashboard fa-fw"></i> {{ _("Explorer") }}</a>
                         </li>
                     </ul>
                 </div>
@@ -190,9 +164,6 @@
     <br>
     <div class="footer">
     </div>
-    <script type="text/javascript" charset="utf-8">
-        refresh_name(localStorage.account_name)
-    </script>
 </body>
 
 </html>

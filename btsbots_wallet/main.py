@@ -46,7 +46,7 @@ URL: <{url}>
     #print(epilog)
     #import wallet
     #wallet.main()
-    import app
+    from btsbots_wallet import app
     app.main()
 
     return 0
