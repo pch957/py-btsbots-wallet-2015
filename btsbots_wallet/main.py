@@ -43,9 +43,6 @@ URL: <{url}>
 
     arg_parser.parse_args(args=argv[1:])
 
-    #print(epilog)
-    #import wallet
-    #wallet.main()
     from btsbots_wallet import app
     app.main()
 

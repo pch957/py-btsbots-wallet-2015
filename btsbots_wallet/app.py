@@ -1,19 +1,10 @@
-#from gevent import monkey
-#monkey.patch_all()
-
-#import datetime
 import time
 from threading import Thread
-#from flask import Flask, render_template, session, request
-from flask import Flask, render_template, request, redirect, url_for
-from flask.ext.babel import gettext
-#from flask import send_from_directory
-#from flask import flash
-from flask.ext.socketio import SocketIO, emit
-from flask.ext.babel import Babel
-#from pprint import pprint
+from flask import Flask, render_template, request
+from flask_babel import gettext
+from flask_babel import Babel
+from flask_socketio import SocketIO, emit
 
-# from pprint import pprint
 from bts.ws.base_protocol import BaseProtocol
 import datetime
 
@@ -29,13 +20,16 @@ socketio = SocketIO(app)
 babel = Babel(app)
 contacts = ["test-alice", "test-bob", "rou.baozi"]
 
+
 def id_to_int(id):
     return int(id.split('.')[-1])
+
 
 def next_id(id):
     id_array = id.split('.')
     id_next = "%s.%s.%d" % (id_array[0], id_array[1], int(id_array[2])+1)
     return id_next
+
 
 class ChainMonitor(BaseProtocol):
     op_id_last = None
@@ -46,7 +40,8 @@ class ChainMonitor(BaseProtocol):
     @asyncio.coroutine
     def get_object_info(self, id):
         if id not in self.object_info:
-            response = yield from self.rpc([self.database_api, "get_objects", [[id]]])
+            response = yield from self.rpc(
+                [self.database_api, "get_objects", [[id]]])
             self.object_info[id] = response[0]
         return self.object_info[id]
 
@@ -58,12 +53,16 @@ class ChainMonitor(BaseProtocol):
         _transfer_info["from"] = response["name"]
         response = yield from self.get_object_info(_info["to"])
         _transfer_info["to"] = response["name"]
-        _asset_info = yield from self.get_object_info(_info["amount"]["asset_id"])
+        _asset_info = yield from self.get_object_info(
+            _info["amount"]["asset_id"])
         _transfer_info["symbol"] = _asset_info["symbol"]
-        _transfer_info["amount"] = float(_info["amount"]["amount"])/10**_asset_info["precision"]
-        print("[33m[%s] %s sent %s %s to %s[m" % (
-            datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), _transfer_info["from"],
-            _transfer_info["amount"], _transfer_info["symbol"], _transfer_info["to"]))
+        _transfer_info["amount"] = float(
+            _info["amount"]["amount"])/10**_asset_info["precision"]
+        print(
+            "[33m[%s] %s sent %s %s to %s[m" % (
+                datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                _transfer_info["from"], _transfer_info["amount"],
+                _transfer_info["symbol"], _transfer_info["to"]))
 
     @asyncio.coroutine
     def handle_op_borrow(self, notify):
@@ -75,12 +74,16 @@ class ChainMonitor(BaseProtocol):
             _balance = _info[_type]
             _asset_info = yield from self.get_object_info(_balance["asset_id"])
             _balance["symbol"] = _asset_info["symbol"]
-            _balance["amount"] = float(_balance["amount"])/10**_asset_info["precision"]
+            _balance["amount"] = float(
+                _balance["amount"])/10**_asset_info["precision"]
             _borrow_info[_type] = _balance
         print("[31m[%s] %s adjust collateral by %s %s, debt by %s %s[m" % (
-            datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), _borrow_info["account"],
-            _borrow_info["delta_collateral"]["amount"], _borrow_info["delta_collateral"]["symbol"],
-            _borrow_info["delta_debt"]["amount"], _borrow_info["delta_debt"]["symbol"]))
+            datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            _borrow_info["account"],
+            _borrow_info["delta_collateral"]["amount"],
+            _borrow_info["delta_collateral"]["symbol"],
+            _borrow_info["delta_debt"]["amount"],
+            _borrow_info["delta_debt"]["symbol"]))
 
     @asyncio.coroutine
     def handle_op_fill(self, notify):
@@ -88,8 +91,8 @@ class ChainMonitor(BaseProtocol):
         if self.last_fill_order is None:
             self.last_fill_order = _info
             return
-        if _info["pays"] != self.last_fill_order["receives"] or \
-          _info["receives"] != self.last_fill_order["pays"]:
+        if _info["pays"] != self.last_fill_order["receives"] or _info[
+                "receives"] != self.last_fill_order["pays"]:
             print("error1: %s" % self.last_fill_order)
             print("error2: %s" % _info)
             self.last_fill_order = _info
@@ -105,14 +108,15 @@ class ChainMonitor(BaseProtocol):
             _balance = _order_info[_type]
             _asset_info = yield from self.get_object_info(_balance["asset_id"])
             _balance["symbol"] = _asset_info["symbol"]
-            _balance["amount"] = float(_balance["amount"])/10**_asset_info["precision"]
+            _balance["amount"] = float(
+                _balance["amount"])/10**_asset_info["precision"]
             _trade_info[_type] = _balance
 
         print("[32m[%s] %s bought %s %s with %s %s from %s[m" % (
-            datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), _trade_info["account1"],
-            _trade_info["receives"]["amount"], _trade_info["receives"]["symbol"],
-            _trade_info["pays"]["amount"], _trade_info["pays"]["symbol"],
-            _trade_info["account2"]))
+            datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            _trade_info["account1"], _trade_info["receives"]["amount"],
+            _trade_info["receives"]["symbol"], _trade_info["pays"]["amount"],
+            _trade_info["pays"]["symbol"], _trade_info["account2"]))
 
     handles = {
         0: handle_op_transfer,
@@ -140,7 +144,8 @@ class ChainMonitor(BaseProtocol):
             self.lock.release()
             return
         while id_to_int(op_id_last) < id_to_int(op_id_cur):
-            response = yield from self.rpc([self.database_api, "get_objects", [[op_id_last]]])
+            response = yield from self.rpc(
+                [self.database_api, "get_objects", [[op_id_last]]])
             _notify = response[0]
             yield from self.handle_operation(_notify)
             op_id_last = next_id(op_id_last)
@@ -150,7 +155,6 @@ class ChainMonitor(BaseProtocol):
 
     @asyncio.coroutine
     def onOpen(self):
-        op_id_last = self.op_id_last
         yield from super().onOpen()
         self.subscribe("1.11.", self.onOperation)
 
@@ -176,10 +180,10 @@ app.jinja_env.filters['datetimefilter'] = datetimefilter
 
 @app.route('/')
 def index():
-    address = request.cookies.get('address')
     return render_template(
         'index.html', title=gettext(u"explorer")
     )
+
 
 @socketio.on('connect', namespace='')
 def test_connect():

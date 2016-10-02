@@ -8,7 +8,7 @@ Information describing the project.
 package = 'btsbots-wallet'
 project = "web wallet for BitShares"
 project_no_spaces = project.replace(' ', '')
-version = '0.1.6'
+version = '0.2.2'
 description = 'web wallet for BitShares'
 authors = ['Alt']
 authors_string = ', '.join(authors)
